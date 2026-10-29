@@ -1,0 +1,1998 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zählerbuch Strom</title>
+<meta name="description" content="Stromzähler ablesen, Verbrauch verstehen, Abrechnung vorhersehen, Verträge im Blick. Ohne Konto, die Daten bleiben auf deinem Gerät.">
+<meta name="theme-color" content="#f3f6f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c1211" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Zählerbuch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+/* Ruhiger App-Stil, verfeinert: helle Fläche, weiße Karten mit weicher Tiefe, große gerundete Zahlen,
+   Grün-Türkis als einziger Akzent, Rot/Grün nur für Geld-Ergebnisse. Handy: Tab-Leiste unten. Desktop: Tabs oben, 12er-Raster. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --surface-2: #edf2f0;
+  --surface-3: #e3eae7;
+  --line: #dfe7e4;
+  --fg: #101c19;
+  --fg-2: #3f4e49;
+  --muted: #66756f;
+  --accent: #0e8f7e;
+  --accent-strong: #0a6f62;
+  --accent-soft: #dbf1eb;
+  --accent-ink: #064d44;
+  --on-accent: #ffffff;
+  --series-2: #e5652c;
+  --good: #108048;
+  --good-soft: #e0f3e7;
+  --bad: #bd3e2a;
+  --bad-soft: #fbe7e2;
+  --warn: #8c5900;
+  --warn-soft: #fcefd3;
+  --heat-1: #d3eee7; --heat-2: #9bd8ca; --heat-3: #51b8a4; --heat-4: #17917d; --heat-5: #0a675a;
+  --p1: #0e8f7e; --p1s: #dbf1eb; --p2: #3b6fd4; --p2s: #e2ebfb; --p3: #b5562a; --p3s: #fbe9df; --p4: #7a52c7; --p4s: #eee6fb; --p5: #a3790b; --p5s: #f8f0d8; --p6: #c23d6e; --p6s: #fbe4ed;
+  --shadow-sm: 0 1px 2px rgb(16 40 34 / 0.05);
+  --shadow: 0 1px 2px rgb(16 40 34 / 0.04), 0 8px 24px -6px rgb(16 40 34 / 0.10);
+  --shadow-lg: 0 2px 4px rgb(16 40 34 / 0.04), 0 18px 48px -12px rgb(16 40 34 / 0.22);
+  --scrim: rgb(8 18 16 / 0.40);
+  --radius: 24px;
+  --radius-md: 18px;
+  --radius-sm: 13px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-num: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1211; --surface: #141c1a; --surface-2: #1b2522; --surface-3: #22302c; --line: #25322e; --fg: #e8f0ed; --fg-2: #b6c4bf; --muted: #889893;
+    --accent: #36c2aa; --accent-strong: #64d6c2; --accent-soft: #123630; --accent-ink: #9be6d8; --on-accent: #04241e;
+    --series-2: #f0844f; --good: #4cc584; --good-soft: #112e1e; --bad: #f2806c; --bad-soft: #371913; --warn: #e6b04c; --warn-soft: #30250d;
+    --heat-1: #173631; --heat-2: #1c5a4f; --heat-3: #228070; --heat-4: #2ea891; --heat-5: #62d5c1;
+    --p1: #4fd0b9; --p1s: #123630; --p2: #82a8f2; --p2s: #18263f; --p3: #f09a6e; --p3s: #3a2116; --p4: #b79af0; --p4s: #2a2040; --p5: #e2b94c; --p5s: #33290e; --p6: #f08cb2; --p6s: #3a1826;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3); --shadow: 0 1px 2px rgb(0 0 0 / 0.35); --shadow-lg: 0 18px 48px -12px rgb(0 0 0 / 0.6); --scrim: rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1211; --surface: #141c1a; --surface-2: #1b2522; --surface-3: #22302c; --line: #25322e; --fg: #e8f0ed; --fg-2: #b6c4bf; --muted: #889893;
+  --accent: #36c2aa; --accent-strong: #64d6c2; --accent-soft: #123630; --accent-ink: #9be6d8; --on-accent: #04241e;
+  --series-2: #f0844f; --good: #4cc584; --good-soft: #112e1e; --bad: #f2806c; --bad-soft: #371913; --warn: #e6b04c; --warn-soft: #30250d;
+  --heat-1: #173631; --heat-2: #1c5a4f; --heat-3: #228070; --heat-4: #2ea891; --heat-5: #62d5c1;
+  --p1: #4fd0b9; --p1s: #123630; --p2: #82a8f2; --p2s: #18263f; --p3: #f09a6e; --p3s: #3a2116; --p4: #b79af0; --p4s: #2a2040; --p5: #e2b94c; --p5s: #33290e; --p6: #f08cb2; --p6s: #3a1826;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3); --shadow: 0 1px 2px rgb(0 0 0 / 0.35); --shadow-lg: 0 18px 48px -12px rgb(0 0 0 / 0.6); --scrim: rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.015em; }
+a { color: var(--accent-strong); }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: 0.875rem; }
+.eyebrow { font-size: 0.78rem; font-weight: 650; color: var(--muted); letter-spacing: 0.02em; }
+
+/* ---------- Gerüst ---------- */
+.app { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+.appbar { display: flex; align-items: center; gap: 12px; padding-block: 10px 20px; }
+.appbar .hello { flex: 1; min-width: 0; }
+.appbar h1 { font-size: 2rem; font-weight: 750; letter-spacing: -0.025em; line-height: 1.1; }
+.appbar .sub { color: var(--muted); font-size: 0.92rem; margin-top: 3px; }
+.round-btn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--surface); box-shadow: var(--shadow); display: grid; place-items: center; cursor: pointer; color: var(--fg-2); flex: none; transition: transform .15s var(--ease); }
+.round-btn:active { transform: scale(.94); }
+.toptabs { display: none; }
+.btn.read-top { display: none; }
+
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: saturate(1.8) blur(18px); -webkit-backdrop-filter: saturate(1.8) blur(18px); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px max(6px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-right)); }
+.tab { border: 0; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 0; font-size: 0.68rem; font-weight: 650; color: var(--muted); cursor: pointer; border-radius: 12px; position: relative; }
+.tab svg { width: 24px; height: 24px; transition: transform .2s var(--ease); }
+.tab[aria-selected="true"] { color: var(--accent); }
+.tab[aria-selected="true"] svg { transform: translateY(-1px) scale(1.06); }
+.tab .badge { position: absolute; top: 4px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: 50%; background: var(--series-2); box-shadow: 0 0 0 2px var(--surface); }
+.fab { position: fixed; z-index: 21; right: max(16px, env(safe-area-inset-right)); bottom: calc(80px + env(safe-area-inset-bottom)); border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 1rem; padding: 15px 22px 15px 18px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 10px 26px -6px color-mix(in srgb, var(--accent) 60%, transparent); cursor: pointer; transition: transform .15s var(--ease); }
+.fab:active { transform: scale(0.96); }
+
+@media (min-width: 900px) {
+  .app { padding-bottom: 56px; padding-top: 22px; }
+  .tabbar, .fab { display: none; }
+  .appbar { flex-wrap: wrap; justify-content: space-between; row-gap: 18px; }
+  .appbar .hello { flex: 1 1 calc(100% - 60px); order: 1; }
+  .appbar .round-btn { order: 2; }
+  .appbar h1 { font-size: 2.3rem; }
+  .toptabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 999px; order: 3; }
+  .toptabs .tab { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; font-size: 0.92rem; border-radius: 999px; }
+  .toptabs .tab svg { width: 18px; height: 18px; }
+  .toptabs .tab .badge { top: 8px; left: 26px; }
+  .toptabs .tab[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: var(--shadow-sm); }
+  .btn.read-top { display: inline-flex; order: 4; }
+}
+
+/* ---------- Karten & Raster ---------- */
+.panel { display: grid; gap: 16px; }
+.panel.enter { animation: rise .35s var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.cols { display: grid; gap: 16px; align-items: start; }
+.stack { display: grid; gap: 16px; min-width: 0; align-content: start; }
+@media (min-width: 900px) {
+  .cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .cols.wide { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+  .cols > .span { grid-column: 1 / -1; }
+}
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; display: grid; gap: 14px; min-width: 0; align-content: start; }
+.card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.card h2 { font-size: 1.12rem; font-weight: 720; }
+.card h3 { font-size: 1rem; font-weight: 680; }
+.section-title { font-size: 1.35rem; font-weight: 750; padding: 14px 4px 0; letter-spacing: -0.02em; }
+.section-sub { color: var(--muted); padding: 0 4px; margin-top: -10px; font-size: 0.92rem; }
+.link-btn { border: 0; background: none; color: var(--accent-strong); font-weight: 650; cursor: pointer; padding: 4px 0; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 4px; }
+.divider { height: 1px; background: var(--line); margin-inline: -20px; }
+
+/* Hero */
+.hero { padding: 24px; gap: 18px; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 12%, transparent), transparent); pointer-events: none; }
+.hero.bill::after { background: radial-gradient(closest-side, color-mix(in srgb, var(--hero-tint, var(--accent)) 14%, transparent), transparent); }
+.hero-amount { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 750; font-size: clamp(3.1rem, 13vw, 4.6rem); line-height: 0.95; letter-spacing: -0.035em; }
+.hero-amount.mid { font-size: clamp(2.3rem, 9vw, 3rem); }
+.hero-amount .approx { font-weight: 500; opacity: .55; margin-right: 2px; }
+.pos { color: var(--good); }
+.neg { color: var(--bad); }
+.hero-text { color: var(--fg-2); max-width: 62ch; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 0.8rem; font-weight: 650; background: var(--surface-2); color: var(--fg-2); justify-self: start; white-space: nowrap; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.accent { background: var(--accent-soft); color: var(--accent-ink); }
+.pill .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.breakdown { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.breakdown > div { background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px 14px; display: grid; gap: 1px; min-width: 0; }
+.breakdown .k { font-size: 0.78rem; color: var(--muted); }
+.breakdown .v { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1.1rem; }
+@media (max-width: 480px) { .breakdown { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .breakdown > div:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+
+/* Prognose-Band */
+.band { display: grid; gap: 8px; }
+.band-track { position: relative; height: 36px; }
+.band-axis { position: absolute; left: 0; right: 0; top: 15px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--bad-soft) 0 50%, var(--good-soft) 50% 100%); }
+.band-zero { position: absolute; top: 6px; width: 2px; height: 24px; background: var(--fg-2); border-radius: 1px; transform: translateX(-1px); opacity: .5; }
+.band-range { position: absolute; top: 11px; height: 14px; border-radius: 7px; background: color-mix(in srgb, var(--fg) 14%, transparent); }
+.band-dot { position: absolute; top: 8px; width: 20px; height: 20px; border-radius: 50%; transform: translateX(-10px); border: 3px solid var(--surface); box-shadow: var(--shadow); }
+.band-labels { display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--muted); }
+.band-labels b { font-weight: 650; }
+@media (prefers-reduced-motion: no-preference) { .band-dot, .band-range { transition: left .6s var(--ease), width .6s var(--ease); } }
+
+.spark { display: grid; grid-template-columns: repeat(12, 1fr); align-items: end; gap: 5px; height: 58px; }
+.spark i { display: block; border-radius: 6px 6px 3px 3px; background: var(--accent); min-height: 3px; transform-origin: bottom; }
+.spark i.est { background: repeating-linear-gradient(135deg, var(--accent-soft) 0 3px, color-mix(in srgb, var(--accent) 35%, var(--accent-soft)) 3px 6px); }
+@media (prefers-reduced-motion: no-preference) { .panel.enter .spark i { animation: grow .6s var(--ease) both; } }
+@keyframes grow { from { transform: scaleY(0.1); } to { transform: none; } }
+.spark-labels { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; font-size: 0.66rem; color: var(--muted); text-align: center; margin-top: -10px; }
+.meterline { display: flex; align-items: center; gap: 8px; font-size: 0.86rem; color: var(--muted); flex-wrap: wrap; }
+.progress { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; position: relative; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 900px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tile { background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow); padding: 15px 16px; display: grid; gap: 3px; align-content: start; min-width: 0; }
+.tile .ic { width: 30px; height: 30px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-strong); display: grid; place-items: center; margin-bottom: 6px; }
+.tile .v { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 1.55rem; font-weight: 750; letter-spacing: -0.02em; line-height: 1.1; }
+.tile .v small { font-size: 0.88rem; font-weight: 650; color: var(--fg-2); margin-left: 3px; letter-spacing: 0; }
+.tile .k { font-size: 0.8rem; color: var(--muted); }
+
+.notice { display: flex; gap: 14px; align-items: center; padding: 15px 18px; border-radius: var(--radius-md); }
+.notice.accent { background: var(--accent-soft); }
+.notice.warn { background: var(--warn-soft); }
+.notice.bad { background: var(--bad-soft); }
+.notice .ico { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: var(--surface); flex: none; color: var(--accent); box-shadow: var(--shadow-sm); }
+.notice.warn .ico { color: var(--warn); }
+.notice.bad .ico { color: var(--bad); }
+.notice .txt { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.notice .txt b { font-weight: 700; }
+.notice .txt span { color: var(--fg-2); font-size: 0.9rem; }
+@media (max-width: 520px) { .notice { flex-wrap: wrap; } .notice > .btn { width: 100%; } }
+
+/* Buttons & Formulare */
+.btn { border: 0; border-radius: 999px; padding: 11px 18px; font-weight: 680; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface-2); color: var(--fg); text-decoration: none; transition: transform .12s var(--ease), filter .15s; white-space: nowrap; }
+.btn:hover { filter: brightness(0.97); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--accent); color: var(--on-accent); box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
+.btn.soft { background: var(--accent-soft); color: var(--accent-ink); }
+.btn.danger { background: var(--bad-soft); color: var(--bad); }
+.btn.ghost { background: transparent; }
+.btn.block { width: 100%; }
+.btn.sm { padding: 7px 13px; font-size: 0.85rem; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 2px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > label, .field > .lbl { font-size: 0.86rem; font-weight: 650; color: var(--fg-2); }
+.field .help { font-size: 0.8rem; color: var(--muted); }
+.input { width: 100%; min-width: 0; border: 1.5px solid var(--line); background: var(--surface); border-radius: 13px; padding: 11px 13px; font-size: 1rem; appearance: none; -webkit-appearance: none; transition: border-color .15s, box-shadow .15s; }
+textarea.input { min-height: 84px; resize: vertical; }
+.input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+.input[aria-invalid="true"] { border-color: var(--bad); }
+.input.big { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 2rem; font-weight: 750; letter-spacing: 0.02em; padding: 12px 14px; }
+select.input { background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+.unit { position: relative; }
+.unit .input { padding-right: 70px; }
+.unit span { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.86rem; pointer-events: none; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .grid3 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .grid3 > :last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (max-width: 420px) { .grid2.wrap { grid-template-columns: minmax(0, 1fr); } }
+.seg { display: inline-flex; background: var(--surface-2); padding: 3px; border-radius: 13px; gap: 2px; flex-wrap: wrap; justify-self: start; }
+.seg button { border: 0; background: none; padding: 8px 13px; border-radius: 10px; font-size: 0.9rem; font-weight: 650; color: var(--fg-2); cursor: pointer; transition: background .15s; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: var(--shadow-sm); }
+.msg { font-size: 0.9rem; padding: 10px 12px; border-radius: 12px; }
+.msg.err { background: var(--bad-soft); color: var(--bad); }
+.msg.warn { background: var(--warn-soft); color: var(--warn); }
+.msg.ok { background: var(--good-soft); color: var(--good); }
+.preview { font-size: 0.9rem; color: var(--fg-2); min-height: 1.3em; }
+.form-section { display: grid; gap: 12px; }
+.form-section > h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 700; }
+
+/* Listen */
+.list { display: grid; }
+.li { display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid var(--line); min-width: 0; }
+.li:last-child { border-bottom: 0; }
+.li .main { flex: 1; min-width: 0; display: grid; }
+.li .main b { font-weight: 650; }
+.li .main span { font-size: 0.84rem; color: var(--muted); }
+.li .end { text-align: right; display: grid; flex: none; }
+.li .end b { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 700; }
+.li .end span { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.icon-btn { width: 38px; height: 38px; border-radius: 11px; border: 0; background: none; color: var(--muted); display: grid; place-items: center; cursor: pointer; flex: none; }
+.icon-btn:hover { background: var(--surface-2); color: var(--fg); }
+.icon-btn.danger:hover { color: var(--bad); background: var(--bad-soft); }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bad-soft); border-radius: 12px; margin-block: 6px; }
+.daydot { width: 42px; height: 42px; border-radius: 13px; background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; font-weight: 750; font-size: 0.84rem; line-height: 1.05; text-align: center; flex: none; font-variant-numeric: tabular-nums; }
+.daydot small { font-weight: 650; font-size: 0.6rem; display: block; }
+
+/* Anbieter */
+.avatar { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-weight: 800; font-size: 1.02rem; letter-spacing: -0.02em; flex: none; background: var(--ps); color: var(--pc); }
+.avatar.lg { width: 58px; height: 58px; border-radius: 18px; font-size: 1.25rem; }
+.avatar.sm { width: 34px; height: 34px; border-radius: 11px; font-size: 0.82rem; }
+.contract-head { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.contract-head .t { min-width: 0; display: grid; gap: 1px; flex: 1; }
+.contract-head h2 { font-size: 1.3rem; overflow-wrap: anywhere; }
+.contract-head .sub { color: var(--muted); font-size: 0.9rem; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.facts > div { background: var(--surface-2); padding: 12px 14px; display: grid; gap: 1px; min-width: 0; }
+.facts .k { font-size: 0.78rem; color: var(--muted); }
+.facts .v { font-weight: 700; font-family: var(--font-num); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+@media (min-width: 640px) { .facts.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.term { display: grid; gap: 8px; }
+.term-bar { position: relative; height: 10px; border-radius: 5px; background: var(--surface-2); }
+.term-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--accent); }
+.term-bar .dl { position: absolute; top: -5px; width: 3px; height: 20px; border-radius: 2px; background: var(--series-2); transform: translateX(-1px); }
+.term-labels { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); gap: 8px; }
+.countdown { display: flex; gap: 16px; align-items: center; padding: 14px; border-radius: var(--radius-md); background: var(--surface-2); }
+.countdown.warn { background: var(--warn-soft); }
+.countdown.bad { background: var(--bad-soft); }
+.countdown .ring { position: relative; width: 74px; height: 74px; flex: none; }
+.countdown .ring svg { width: 74px; height: 74px; transform: rotate(-90deg); }
+.countdown .ring span { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: var(--font-num); font-weight: 800; font-size: 1.25rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.countdown .ring span small { font-size: 0.6rem; font-weight: 650; color: var(--muted); font-family: var(--font); margin-top: 3px; }
+.countdown .txt { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.countdown .txt b { font-weight: 700; }
+.countdown .txt span { font-size: 0.88rem; color: var(--fg-2); }
+.copyrow { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.copyrow:last-child { border-bottom: 0; }
+.copyrow .k { font-size: 0.84rem; color: var(--muted); width: 120px; flex: none; }
+.copyrow .v { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+
+/* Checkliste */
+.checklist { display: grid; gap: 2px; }
+.ck-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ck-head .who { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.ck-head .who > div:last-child { display: grid; min-width: 0; }
+.switch-row { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ck { display: flex; gap: 12px; align-items: flex-start; padding: 10px 6px; border-radius: 12px; cursor: pointer; border: 0; background: none; text-align: left; width: 100%; }
+.ck:hover { background: var(--surface-2); }
+.ck .box { width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--line); flex: none; display: grid; place-items: center; color: transparent; transition: background .2s, border-color .2s, color .2s; margin-top: 1px; }
+.ck[aria-checked="true"] .box { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.ck[aria-checked="true"] .box svg { animation: pop .3s var(--ease); }
+@keyframes pop { from { transform: scale(.3); } to { transform: none; } }
+.ck .t { display: grid; gap: 1px; min-width: 0; }
+.ck .t b { font-weight: 620; }
+.ck[aria-checked="true"] .t b { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+.ck .t span { font-size: 0.82rem; color: var(--muted); }
+.ring-sm { width: 46px; height: 46px; flex: none; position: relative; }
+.ring-sm svg { width: 46px; height: 46px; transform: rotate(-90deg); }
+.ring-sm span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; font-family: var(--font-num); }
+
+/* Zeitstrahl */
+.timeline { display: grid; position: relative; }
+.tl { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; position: relative; padding-bottom: 20px; }
+.tl:last-child { padding-bottom: 0; }
+.tl::before { content: ""; position: absolute; left: 22px; top: 50px; bottom: 2px; width: 2px; background: var(--line); border-radius: 1px; }
+.tl:last-child::before { display: none; }
+.tl .body { display: grid; gap: 8px; min-width: 0; padding-top: 2px; }
+.tl .row1 { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.tl .row1 b { font-weight: 700; font-size: 1.02rem; }
+.tl .meta { font-size: 0.84rem; color: var(--muted); }
+.tl .stats { display: flex; flex-wrap: wrap; gap: 6px; }
+.tl .stats span { font-size: 0.8rem; background: var(--surface-2); padding: 4px 9px; border-radius: 8px; font-variant-numeric: tabular-nums; color: var(--fg-2); }
+.pricebar { display: grid; grid-template-columns: 56px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 0.84rem; }
+.pricebar i { display: block; height: 12px; border-radius: 6px; background: var(--accent); }
+.pricebar .lab { color: var(--fg-2); font-weight: 650; }
+.pricebar .val { text-align: right; font-family: var(--font-num); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Diagramme */
+.chart { position: relative; min-width: 0; touch-action: pan-y; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--font); font-size: 11px; fill: var(--muted); }
+.chart text.val { fill: var(--fg-2); font-weight: 650; }
+.chart text.halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.gl { stroke: var(--line); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--fg-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.sw.line { height: 3px; width: 16px; border-radius: 2px; }
+.sw.hatch { background: repeating-linear-gradient(135deg, var(--accent-soft) 0 2px, color-mix(in srgb, var(--accent) 45%, var(--accent-soft)) 2px 5px); }
+.tip { position: absolute; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 0.8rem; line-height: 1.4; padding: 8px 11px; border-radius: 11px; white-space: nowrap; z-index: 5; box-shadow: var(--shadow-lg); }
+.empty { padding: 26px 16px; text-align: center; color: var(--muted); font-size: 0.92rem; background: var(--surface-2); border-radius: var(--radius-sm); display: grid; gap: 8px; justify-items: center; }
+.empty svg { color: var(--accent); opacity: .8; }
+.scroll-x { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+
+.scale { position: relative; height: 14px; border-radius: 7px; display: flex; overflow: hidden; }
+.scale i { display: block; height: 100%; }
+.scale-wrap { position: relative; padding-top: 34px; padding-bottom: 22px; }
+.scale-mark { position: absolute; top: 0; transform: translateX(-50%); display: grid; justify-items: center; gap: 2px; font-size: 0.78rem; font-weight: 750; white-space: nowrap; }
+.scale-mark .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); box-shadow: var(--shadow); margin-top: 4px; }
+.scale-ref { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 0.74rem; color: var(--muted); white-space: nowrap; }
+.scale-ref::before { content: ""; position: absolute; left: 50%; bottom: 18px; width: 2px; height: 24px; background: var(--fg-2); border-radius: 1px; }
+.scale-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
+.big-stat { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 2.2rem; font-weight: 750; letter-spacing: -0.02em; line-height: 1.1; }
+.big-stat small { font-size: 1rem; font-weight: 650; color: var(--fg-2); letter-spacing: 0; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.duo > div { background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px; display: grid; gap: 2px; min-width: 0; }
+.duo .v { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 1.4rem; font-weight: 750; }
+.duo .k { font-size: 0.8rem; color: var(--muted); }
+.heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 12px); gap: 3px; width: max-content; }
+.heat i { width: 12px; height: 12px; border-radius: 3px; background: var(--surface-2); display: block; }
+.heat-legend { display: flex; gap: 4px; align-items: center; font-size: 0.75rem; color: var(--muted); }
+.heat-legend i { width: 12px; height: 12px; border-radius: 3px; display: block; }
+.heat-months { display: grid; grid-auto-flow: column; gap: 3px; font-size: 0.7rem; color: var(--muted); width: max-content; height: 16px; }
+
+/* Dialoge */
+dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); max-width: none; max-height: none; }
+dialog::backdrop { background: var(--scrim); backdrop-filter: blur(2px); }
+.sheet { width: min(540px, 100%); margin: auto auto 0; border-radius: 28px 28px 0 0; padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); max-height: 92vh; overflow-y: auto; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 14px; }
+.sheet form { display: grid; gap: 14px; }
+.sheet[open] { animation: up .32s var(--ease); }
+@keyframes up { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+@media (min-width: 600px) { .sheet { margin: auto; border-radius: 28px; padding: 24px; } .sheet .grab { display: none; } }
+.full { width: min(620px, 100%); height: 100%; margin: 0; border-radius: 0; flex-direction: column; }
+.full[open] { display: flex; animation: up .32s var(--ease); }
+@media (min-width: 640px) { .full { height: min(820px, calc(100% - 48px)); margin: auto; border-radius: 30px; box-shadow: var(--shadow-lg); } }
+.full-top { display: flex; align-items: center; justify-content: space-between; padding: max(14px, env(safe-area-inset-top)) 18px 8px; gap: 12px; }
+.full-top h2 { font-size: 1.2rem; font-weight: 720; }
+.full-body { flex: 1; overflow-y: auto; padding: 8px 24px 20px; display: grid; gap: 22px; align-content: start; }
+.full-foot { padding: 12px 20px calc(14px + env(safe-area-inset-bottom)); display: grid; gap: 10px; border-top: 1px solid var(--line); }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 8px; height: 8px; border-radius: 4px; background: var(--line); transition: width .25s var(--ease), background .25s; }
+.dots i.on { width: 24px; background: var(--accent); }
+.guide-body h2 { font-size: 1.65rem; font-weight: 760; letter-spacing: -0.025em; }
+.guide-body p { color: var(--fg-2); }
+.guide-art { height: 150px; border-radius: 24px; background: var(--accent-soft); display: grid; place-items: center; position: relative; overflow: hidden; }
+.checks { display: grid; gap: 10px; }
+.check { display: flex; gap: 12px; align-items: flex-start; background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px; }
+.check .n { width: 30px; height: 30px; border-radius: 10px; background: var(--surface); color: var(--accent); display: grid; place-items: center; font-weight: 750; flex: none; }
+.check div { display: grid; gap: 2px; }
+.check b { font-weight: 680; }
+.check span { color: var(--fg-2); font-size: 0.9rem; }
+.price-row { display: grid; gap: 10px; padding: 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); }
+.price-row-head { display: flex; justify-content: space-between; align-items: center; }
+.price-row-head b { font-size: 0.92rem; }
+
+.toast { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px); background: var(--fg); color: var(--bg); padding: 11px 18px 11px 14px; border-radius: 999px; font-size: 0.92rem; font-weight: 650; opacity: 0; pointer-events: none; transition: opacity .2s, transform .25s var(--ease); z-index: 50; max-width: calc(100% - 32px); display: inline-flex; gap: 8px; align-items: center; box-shadow: var(--shadow-lg); }
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast svg { color: var(--accent-strong); flex: none; }
+@media (min-width: 900px) { .toast { bottom: 32px; } }
+.demo-bar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; padding: 14px 18px; border-radius: var(--radius-md); background: var(--warn-soft); margin-bottom: 16px; }
+.demo-bar p { flex: 1 1 240px; color: var(--fg); font-size: 0.92rem; }
+@media (hover: hover) { .card.hov { transition: transform .2s var(--ease), box-shadow .2s; } .card.hov:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1v-8.5Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-stats" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5H12V3.5Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M15 3.8A8.5 8.5 0 0 1 20.2 9H15V3.8Z" fill="currentColor"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M13.5 3.8V8.5H18M9 12.5h6M9 16h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.1" fill="currentColor"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16ZM10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 5 13.5h6l-1 8 8-11h-6l1-8Z" fill="currentColor"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 15-14-1 10-6 15-14 15M5 19l7-7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><path d="M4 9.5h16v3H4zM5.5 12.5V20h13v-7.5M12 9.5V20M12 9.5S10.5 4.5 8 5.5s0 4 4 4Zm0 0s1.5-5 4-4 0 4-4 4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" fill="none" stroke="currentColor" stroke-width="1.9"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3.5h12v17l-2.5-1.5-2 1.5-1.5-1.2-1.5 1.2-2-1.5L6 20.5v-17Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 8.5h6M9 12h6M9 15.5h3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app">
+  <header class="appbar">
+    <div class="hello">
+      <h1 id="hello">Zählerbuch</h1>
+      <p class="sub" id="helloSub"></p>
+    </div>
+    <button class="round-btn" type="button" data-act="help" aria-label="Anleitung öffnen" title="Anleitung"><svg width="22" height="22"><use href="#i-help"/></svg></button>
+    <nav class="toptabs" role="tablist" aria-label="Bereiche">
+      <button class="tab" role="tab" data-tab="home"><svg><use href="#i-home"/></svg>Übersicht</button>
+      <button class="tab" role="tab" data-tab="verlauf"><svg><use href="#i-chart"/></svg>Verlauf</button>
+      <button class="tab" role="tab" data-tab="vertraege"><svg><use href="#i-doc"/></svg>Verträge</button>
+      <button class="tab" role="tab" data-tab="statistik"><svg><use href="#i-stats"/></svg>Statistik</button>
+      <button class="tab" role="tab" data-tab="einstellungen"><svg><use href="#i-gear"/></svg>Einstellungen</button>
+    </nav>
+    <button class="btn primary read-top" type="button" data-act="read"><svg width="18" height="18"><use href="#i-plus"/></svg>Zähler ablesen</button>
+  </header>
+
+  <main>
+    <div id="demoBar" class="demo-bar" hidden>
+      <p><b>Das sind Beispieldaten.</b> Schau dich in Ruhe um. Nichts davon wird gespeichert.</p>
+      <button class="btn primary sm" type="button" data-act="setup">Eigenes Zählerbuch anlegen</button>
+    </div>
+    <section class="panel" data-panel="home"></section>
+    <section class="panel" data-panel="verlauf" hidden></section>
+    <section class="panel" data-panel="vertraege" hidden></section>
+    <section class="panel" data-panel="statistik" hidden></section>
+    <section class="panel" data-panel="einstellungen" hidden></section>
+  </main>
+</div>
+
+<button class="fab" type="button" data-act="read"><svg width="20" height="20"><use href="#i-plus"/></svg>Ablesen</button>
+<nav class="tabbar" role="tablist" aria-label="Bereiche">
+  <button class="tab" role="tab" data-tab="home"><svg><use href="#i-home"/></svg>Übersicht</button>
+  <button class="tab" role="tab" data-tab="verlauf"><svg><use href="#i-chart"/></svg>Verlauf</button>
+  <button class="tab" role="tab" data-tab="vertraege"><svg><use href="#i-doc"/></svg>Verträge</button>
+  <button class="tab" role="tab" data-tab="statistik"><svg><use href="#i-stats"/></svg>Statistik</button>
+  <button class="tab" role="tab" data-tab="einstellungen"><svg><use href="#i-gear"/></svg>Mehr</button>
+</nav>
+
+<dialog class="sheet" id="entrySheet" aria-labelledby="entryTitle">
+  <div class="grab"></div>
+  <form id="entryForm" novalidate>
+    <div class="card-head">
+      <h2 id="entryTitle" style="font-size:1.35rem">Zähler ablesen</h2>
+      <button class="icon-btn" type="button" data-act="close-entry" aria-label="Schließen"><svg width="20" height="20"><use href="#i-close"/></svg></button>
+    </div>
+    <input type="hidden" id="editDatum">
+    <div class="field">
+      <label for="enStand">Zählerstand</label>
+      <div class="unit"><input id="enStand" class="input big" type="text" inputmode="decimal" autocomplete="off" placeholder="z. B. 22812"><span>kWh</span></div>
+      <span class="help" id="enLast"></span>
+    </div>
+    <div class="field">
+      <label for="enDatum">Abgelesen am</label>
+      <input id="enDatum" class="input" type="date">
+    </div>
+    <p id="enPreview" class="preview" aria-live="polite"></p>
+    <p id="enMsg" class="msg" hidden></p>
+    <button id="enSubmit" class="btn primary block" type="submit">Speichern</button>
+  </form>
+</dialog>
+
+<dialog class="full" id="contractDlg" aria-labelledby="ctTitle">
+  <div class="full-top">
+    <h2 id="ctTitle">Vertrag</h2>
+    <button class="icon-btn" type="button" data-act="close-contract" aria-label="Schließen"><svg width="20" height="20"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="full-body" id="ctBody"></div>
+  <div class="full-foot" id="ctFoot"></div>
+</dialog>
+
+<dialog class="full" id="guide" aria-labelledby="guideTitle">
+  <div class="full-top">
+    <div class="dots" id="guideDots"></div>
+    <button class="icon-btn" type="button" data-act="close-guide" aria-label="Anleitung schließen"><svg width="20" height="20"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="full-body guide-body" id="guideBody"></div>
+  <div class="full-foot" id="guideFoot"></div>
+</dialog>
+
+<input id="fileIn" type="file" accept=".json,.csv,.txt,application/json,text/csv" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+// ================= Datum =================
+const DAY = 86400000;
+const dn = s => Math.round(Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / DAY);
+const ds = n => new Date(n * DAY).toISOString().slice(0, 10);
+const isDate = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && ds(dn(s)) === s;
+function addMonths(s, m) {
+  const y = +s.slice(0, 4), mo = +s.slice(5, 7) - 1 + m, d = +s.slice(8, 10);
+  const first = new Date(Date.UTC(y, mo, 1));
+  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+  first.setUTCDate(Math.min(d, last));
+  return first.toISOString().slice(0, 10);
+}
+const todayStr = () => { const t = new Date(); return ds(Math.round(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) / DAY)); };
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+// ================= Datenmodell =================
+// Version 3: Verträge mit Preisen, Laufzeit, Kündigungsfrist, Bonus, Nummern, Kontakt, Checkliste.
+const str = (v, n = 120) => typeof v === 'string' ? v.trim().slice(0, n) : '';
+const okNum = v => typeof v === 'number' && isFinite(v) && v >= 0;
+function cleanPrices(list) {
+  const seen = new Set();
+  return (Array.isArray(list) ? list : [])
+    .filter(t => t && isDate(t.ab) && okNum(t.arbeitspreis) && okNum(t.grundpreis) && okNum(t.abschlag))
+    .filter(t => !seen.has(t.ab) && seen.add(t.ab))
+    .map(t => ({ ab: t.ab, arbeitspreis: t.arbeitspreis, grundpreis: t.grundpreis, abschlag: t.abschlag }))
+    .sort((a, b) => a.ab < b.ab ? -1 : 1);
+}
+// Sofortbonus (wird ausgezahlt) und Neukundenbonus (mit der Jahresrechnung) können beide vorkommen.
+// Ältere Daten hatten nur einen Bonus mit "art"; der wird in das passende Feld übernommen.
+function normBonus(b, checks) {
+  const one = x => ({ betrag: okNum(x?.betrag) ? x.betrag : 0, erhalten: isDate(x?.erhalten) ? x.erhalten : null });
+  if (b.sofort || b.neukunde) return { sofort: one(b.sofort), neukunde: one(b.neukunde) };
+  const old = one(b), art = b.art === 'sofort' ? 'sofort' : 'neukunde';
+  if (checks.bonus) { checks[art === 'sofort' ? 'sofortbonus' : 'neubonus'] = checks.bonus; delete checks.bonus; }
+  return { sofort: art === 'sofort' ? old : one(null), neukunde: art === 'neukunde' ? old : one(null) };
+}
+const bonusTotal = c => c.bonus.sofort.betrag + c.bonus.neukunde.betrag;
+function cleanContract(c) {
+  const preise = cleanPrices(c.preise);
+  if (!preise.length) return null;
+  const beginn = isDate(c.beginn) ? c.beginn : preise[0].ab;
+  preise[0] = { ...preise[0], ab: beginn };
+  const f = c.frist || {};
+  const b = c.bonus || {};
+  const k = c.kontakt || {};
+  const checks = {};
+  if (c.checks && typeof c.checks === 'object') for (const [key, v] of Object.entries(c.checks)) if (/^[a-z]{2,20}$/.test(key) && isDate(v)) checks[key] = v;
+  return {
+    id: typeof c.id === 'string' && /^[a-z0-9]{4,16}$/.test(c.id) ? c.id : uid(),
+    anbieter: str(c.anbieter, 60), tarif: str(c.tarif, 60),
+    beginn, ende: isDate(c.ende) && c.ende > beginn ? c.ende : null,
+    frist: { wert: Number.isInteger(f.wert) && f.wert >= 0 && f.wert <= 52 ? f.wert : null, einheit: ['wochen', 'monate', 'tage'].includes(f.einheit) ? f.einheit : 'wochen' },
+    preisgarantie: isDate(c.preisgarantie) ? c.preisgarantie : null,
+    bonus: normBonus(b, checks),
+    kundennr: str(c.kundennr, 40), vertragsnr: str(c.vertragsnr, 40), zaehlernr: str(c.zaehlernr, 40),
+    kontakt: { web: str(k.web, 200), tel: str(k.tel, 40), mail: str(k.mail, 120) },
+    notiz: str(c.notiz, 1000),
+    checks, preise,
+  };
+}
+function sanitize(o) {
+  if (!o || typeof o !== 'object') throw new Error('Das ist keine Zählerbuch-Sicherung.');
+  const seen = new Set();
+  const readings = (Array.isArray(o.readings) ? o.readings : [])
+    .filter(r => r && isDate(r.datum) && okNum(r.stand))
+    .filter(r => !seen.has(r.datum) && seen.add(r.datum))
+    .map(r => ({ datum: r.datum, stand: r.stand }))
+    .sort((a, b) => a.datum < b.datum ? -1 : 1);
+  let vertraege;
+  if (Array.isArray(o.vertraege)) vertraege = o.vertraege.map(c => c && cleanContract(c)).filter(Boolean);
+  else {
+    // Ältere Versionen: Tarifzeilen. Zeilen, die auf einen Abrechnungsjahres-Beginn fallen, werden eigene Verträge.
+    const tarife = cleanPrices(o.tarife);
+    const anchor = isDate(o.vertrag?.abrechnungsbeginn) ? o.vertrag.abrechnungsbeginn : tarife[0]?.ab;
+    vertraege = [];
+    const onAnchor = d => { for (let k = -30; k <= 30; k++) if (addMonths(anchor, 12 * k) === d) return true; return false; };
+    tarife.forEach((t, i) => {
+      if (i === 0 || onAnchor(t.ab)) vertraege.push(cleanContract({ beginn: t.ab, preise: [t] }));
+      else vertraege[vertraege.length - 1].preise.push(t);
+    });
+    if (vertraege.length && anchor && anchor < vertraege[0].beginn) { vertraege[0].beginn = anchor; vertraege[0].preise[0].ab = anchor; }
+  }
+  const bySeen = new Set();
+  vertraege = vertraege.filter(c => !bySeen.has(c.beginn) && bySeen.add(c.beginn)).sort((a, b) => a.beginn < b.beginn ? -1 : 1);
+  if (!vertraege.length) throw new Error('In der Datei fehlt der Stromvertrag.');
+  const p = o.profil || {}, z = o.ziel || {}, er = o.erinnerung || {};
+  return {
+    version: 3,
+    profil: { name: str(p.name, 40), personen: [1, 2, 3, 4, 5].includes(p.personen) ? p.personen : 2, wohnform: p.wohnform === 'haus' ? 'haus' : 'wohnung', co2: okNum(p.co2) ? p.co2 : 363 },
+    ziel: { kwh: okNum(z.kwh) && z.kwh > 0 ? z.kwh : null },
+    erinnerung: { intervall: ['monat', 'woche', '2wochen'].includes(er.intervall) ? er.intervall : 'monat' },
+    meta: { letzteSicherung: isDate(o.meta?.letzteSicherung) ? o.meta.letzteSicherung : null },
+    vertraege, readings,
+  };
+}
+
+// ================= Rechenkern =================
+function buildModel(state) {
+  const R = state.readings.map(r => ({ ...r, d: dn(r.datum) })).sort((a, b) => a.d - b.d);
+  const C = state.vertraege.map(c => ({ ...c, d: dn(c.beginn), P: c.preise.map(p => ({ ...p, d: dn(p.ab) })).sort((a, b) => a.d - b.d) })).sort((a, b) => a.d - b.d);
+  const iv = [];
+  for (let i = 0; i + 1 < R.length; i++) {
+    const a = R[i], b = R[i + 1], kwh = b.stand - a.stand;
+    iv.push({ a: a.d, b: b.d, kwh, rate: kwh / (b.d - a.d), from: a, to: b });
+  }
+  const first = R.length ? R[0].d : null, last = R.length ? R[R.length - 1].d : null;
+  function rateAt(d) {
+    let lo = 0, hi = iv.length - 1;
+    while (lo <= hi) { const m = (lo + hi) >> 1, x = iv[m]; if (d < x.a) hi = m - 1; else if (d >= x.b) lo = m + 1; else return x.rate; }
+    return null;
+  }
+  function meterAt(d) {
+    if (!R.length || d < first || d > last) return null;
+    for (const x of iv) if (d >= x.a && d <= x.b) return x.from.stand + x.rate * (d - x.a);
+    return R[0].stand;
+  }
+  function contractAt(d) { let c = C[0]; for (const x of C) if (x.d <= d) c = x; else break; return c; }
+  function tarifAt(d) { const c = contractAt(d); let t = c.P[0]; for (const x of c.P) if (x.d <= d) t = x; else break; return t; }
+  let avgRate = null;
+  if (iv.length) { const span = Math.min(365, last - first); avgRate = (meterAt(last) - meterAt(last - span)) / span; }
+  function estimate(d) {
+    for (const back of [-12, -24]) { const r = rateAt(dn(addMonths(ds(d), back))); if (r != null) return { r, how: 'vorjahr' }; }
+    return avgRate != null ? { r: avgRate, how: 'schnitt' } : null;
+  }
+  return { R, C, iv, first, last, rateAt, meterAt, contractAt, tarifAt, avgRate, estimate };
+}
+// Abrechnungsjahre: je Vertrag in 12-Monats-Schritten ab Vertragsbeginn, bis der nächste Vertrag beginnt.
+function listPeriods(M) {
+  const today = dn(todayStr());
+  const endD = Math.max(M.last ?? today, today), startD = M.first ?? today;
+  const out = [];
+  M.C.forEach((c, i) => {
+    if (c.d > endD) return;
+    const limit = M.C[i + 1] && M.C[i + 1].d <= endD + 400 ? M.C[i + 1].beginn : null;
+    let s = c.beginn;
+    while (dn(s) <= endD && (!limit || s < limit)) {
+      let e = addMonths(s, 12);
+      if (limit && e > limit) e = limit;
+      out.push({ S: s, E: e, cid: c.id });
+      s = e;
+    }
+  });
+  const relevant = out.filter(p => dn(p.E) > startD);
+  return relevant.length ? relevant : out.slice(-1);
+}
+function calcPeriod(M, per) {
+  const { S, E } = per, s = dn(S), e = dn(E);
+  const contract = M.C.find(c => c.id === per.cid);
+  const months = new Map();
+  let kwhKnown = 0, kwhEst = 0, costEnergy = 0, costGrund = 0, knownDays = 0, missing = false, estCost = 0;
+  const hows = new Set(), cum = [];
+  for (let d = s; d < e; d++) {
+    const key = ds(d).slice(0, 7);
+    if (!months.has(key)) months.set(key, { key, known: 0, est: 0, days: 0, knownDays: 0 });
+    const mo = months.get(key);
+    mo.days++;
+    let r = null, known = false;
+    if (M.first != null && d >= M.first && d < M.last) { r = M.rateAt(d); known = r != null; }
+    let how = null;
+    if (!known) { const est = M.estimate(d); if (est) { r = est.r; how = est.how; hows.add(how); } else missing = true; }
+    const t = M.tarifAt(d);
+    costGrund += t.grundpreis * 12 / 365;
+    if (r != null) {
+      const ce = r * t.arbeitspreis / 100;
+      costEnergy += ce;
+      if (known) { kwhKnown += r; mo.known += r; knownDays++; mo.knownDays++; }
+      else { kwhEst += r; mo.est += r; estCost += ce * (how === 'vorjahr' ? 0.10 : 0.18); }
+    }
+    cum.push({ d, cost: costEnergy + costGrund, known });
+  }
+  let abschlaege = 0;
+  const abschlagSteps = [];
+  for (let m = 0; m < 12; m++) {
+    const md = addMonths(S, m);
+    if (md >= E) break;
+    abschlaege += M.tarifAt(dn(md)).abschlag;
+    abschlagSteps.push({ d: dn(md), sum: abschlaege });
+  }
+  // Bonus zählt im ersten Abrechnungsjahr eines Vertrags. Neukundenbonus wird mit der Rechnung verrechnet, Sofortbonus separat ausgezahlt.
+  const firstYear = contract && contract.beginn === S;
+  const bonus = firstYear ? bonusTotal(contract) : 0;
+  const bonusInBill = firstYear ? contract.bonus.neukunde.betrag : 0;
+  const cost = costEnergy + costGrund;
+  const diff = abschlaege - cost + bonusInBill;
+  const totalDays = e - s;
+  return {
+    S, E, s, e, cid: per.cid, contract, totalDays, knownDays, complete: knownDays === totalDays,
+    kwhKnown, kwhEst, kwh: kwhKnown + kwhEst, costEnergy, costGrund, cost, bonus, bonusInBill,
+    netCost: cost - bonus, abschlaege, diff, unsicher: estCost, lo: diff - estCost, hi: diff + estCost,
+    fitAbschlag: Math.ceil(Math.max(0, cost - bonusInBill) / Math.max(1, abschlagSteps.length)),
+    months: [...months.values()], cum, abschlagSteps,
+    how: hows.has('vorjahr') && hows.has('schnitt') ? 'mix' : hows.has('vorjahr') ? 'vorjahr' : hows.has('schnitt') ? 'schnitt' : null,
+    noForecast: missing || M.iv.length === 0,
+    sicherheit: knownDays / totalDays >= 0.65 ? 'hoch' : knownDays / totalDays >= 0.25 ? 'mittel' : 'niedrig',
+  };
+}
+// Kündigung muss bis zu diesem Tag beim Anbieter sein.
+function kuendigenBis(c) {
+  if (!c.ende || c.frist.wert == null) return null;
+  const base = ds(dn(c.ende) + 1);
+  const f = c.frist;
+  const x = f.einheit === 'monate' ? addMonths(base, -f.wert) : ds(dn(base) - f.wert * (f.einheit === 'wochen' ? 7 : 1));
+  return ds(dn(x) - 1);
+}
+function currentContract(M) { const t = dn(todayStr()); const past = M.C.filter(c => c.d <= t); return past.length ? past[past.length - 1] : M.C[0]; }
+function upcomingContract(M) { const t = dn(todayStr()); return M.C.find(c => c.d > t) || null; }
+
+// ---- Statistiken ----
+function calendarMonths(M) {
+  if (M.iv.length === 0) return [];
+  const out = new Map();
+  for (let d = M.first; d < M.last; d++) {
+    const k = ds(d).slice(0, 7);
+    if (!out.has(k)) out.set(k, { key: k, kwh: 0, knownDays: 0, days: dn(addMonths(k + '-01', 1)) - dn(k + '-01') });
+    const m = out.get(k); m.kwh += M.rateAt(d); m.knownDays++;
+  }
+  return [...out.values()].map(m => ({ ...m, complete: m.knownDays === m.days, perDay: m.kwh / m.knownDays }));
+}
+function rollingYear(M) {
+  if (M.iv.length === 0 || M.last - M.first < 365) return [];
+  const pts = [];
+  const f = ds(M.first + 365);
+  let s = f.slice(8) === '01' ? f : addMonths(f.slice(0, 7) + '-01', 1);
+  while (dn(s) <= M.last) { const e = dn(s); pts.push({ d: e, key: s, kwh: M.meterAt(e) - M.meterAt(e - 365) }); s = addMonths(s, 1); }
+  if (!pts.length || pts[pts.length - 1].d !== M.last) pts.push({ d: M.last, key: ds(M.last), kwh: M.meterAt(M.last) - M.meterAt(M.last - 365) });
+  return pts;
+}
+function yearBasis(M, cur) {
+  if (M.iv.length && M.last - M.first >= 365) return { kwh: M.meterAt(M.last) - M.meterAt(M.last - 365), how: 'gemessen in den letzten 12 Monaten' };
+  if (cur && !cur.noForecast) return { kwh: cur.kwh * 365 / cur.totalDays, how: 'hochgerechnet aufs Jahr' };
+  return null;
+}
+const RICHTWERTE = { wohnung: [1400, 2200, 2800, 3300, 3800], haus: [2000, 3000, 3600, 4200, 5000] };
+const richtwert = p => RICHTWERTE[p.wohnform === 'haus' ? 'haus' : 'wohnung'][Math.min(5, Math.max(1, p.personen)) - 1];
+function seasons(M) {
+  if (M.iv.length === 0) return null;
+  const from = Math.max(M.first, M.last - 365);
+  let s = 0, sn = 0, w = 0, wn = 0;
+  for (let d = from; d < M.last; d++) { const mo = +ds(d).slice(5, 7), r = M.rateAt(d); if (mo >= 4 && mo <= 9) { s += r; sn++; } else { w += r; wn++; } }
+  return { summer: sn ? s / sn : null, winter: wn ? w / wn : null, sn, wn };
+}
+function nextDue(state, M) {
+  const iv = state.erinnerung.intervall;
+  if (!M.R.length) return todayStr();
+  const last = M.R[M.R.length - 1].datum;
+  if (iv === 'woche') return ds(dn(last) + 7);
+  if (iv === '2wochen') return ds(dn(last) + 14);
+  return addMonths(last.slice(0, 7) + '-01', 1);
+}
+
+// ---- Wechsel-Checkliste ----
+const CHECKS = [
+  { k: 'abschluss', t: 'Neuen Vertrag abgeschlossen', h: 'Auftragsbestätigung aufheben.' },
+  { k: 'kuendigung', t: 'Alten Vertrag gekündigt', h: 'Oder bestätigt, dass der neue Anbieter für dich kündigt.' },
+  { k: 'lieferbeginn', t: 'Lieferbeginn bestätigt', h: 'Der neue Anbieter nennt das genaue Datum.' },
+  { k: 'ablesung', t: 'Zählerstand am Wechseltag eingetragen', h: 'Wird automatisch erkannt, wenn du um den Wechseltag abliest.', auto: true },
+  { k: 'gemeldet', t: 'Zählerstand an beide Anbieter gemeldet', h: 'Schützt dich vor geschätzten Werten in der Rechnung.' },
+  { k: 'lastschrift', t: 'Alte Abschläge gestoppt, neue laufen', h: 'Kontoauszug prüfen.' },
+  { k: 'schluss', t: 'Schlussrechnung des alten Anbieters geprüft', h: 'Mit dem Ergebnis im Zählerbuch vergleichen.' },
+  { k: 'sofortbonus', t: 'Sofortbonus erhalten', h: 'Kommt meist einige Wochen nach Lieferbeginn aufs Konto.', bonus: 'sofort' },
+  { k: 'neubonus', t: 'Neukundenbonus verrechnet', h: 'Kommt meist mit der ersten Jahresrechnung.', bonus: 'neukunde' },
+];
+function checklistFor(M, c) {
+  const items = CHECKS.filter(x => !x.bonus || c.bonus[x.bonus].betrag > 0).map(x => {
+    let done = !!c.checks[x.k], auto = false;
+    if (x.k === 'ablesung' && !done) { const hit = M.R.find(r => Math.abs(r.d - c.d) <= 3); if (hit) { done = true; auto = true; } }
+    if (x.bonus && !done && c.bonus[x.bonus].erhalten) done = true;
+    return { ...x, done, auto };
+  });
+  return { items, done: items.filter(i => i.done).length, total: items.length };
+}
+
+// ---- Eingabe ----
+function parseNum(v) {
+  let s = String(v ?? '').trim().replace(/\s/g, '').replace(/€|ct|kwh/gi, '');
+  if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  return /^-?\d+(\.\d+)?$/.test(s) ? Number(s) : NaN;
+}
+
+function sampleState() {
+  const start = dn('2024-03-02'), end = dn('2026-10-03');
+  const rate = d => { const doy = d - dn(ds(d).slice(0, 4) + '-01-01'); return 6.1 + 1.9 * Math.cos(2 * Math.PI * (doy - 20) / 365) - (d > dn('2025-09-01') ? 0.35 : 0); };
+  const readings = [];
+  let stand = 31480, d = start, i = 0, acc = 0;
+  readings.push({ datum: ds(d), stand });
+  while (d < end) {
+    const next = Math.min(end, dn(addMonths(ds(d).slice(0, 7) + '-01', 1)) + ((i * 7) % 5));
+    for (let x = d; x < next; x++) acc += rate(x);
+    stand += Math.round(acc); acc -= Math.round(acc); d = next; i++;
+    readings.push({ datum: ds(d), stand });
+  }
+  readings.push({ datum: '2025-03-01', stand: 33910 });
+  return sanitize({
+    profil: { name: 'Alex', personen: 2, wohnform: 'wohnung' },
+    ziel: { kwh: 2100 },
+    vertraege: [
+      { anbieter: 'Stadtwerke Musterstadt', tarif: 'Strom Basis', beginn: '2024-03-01', ende: '2025-02-28', frist: { wert: 1, einheit: 'monate' },
+        preise: [{ ab: '2024-03-01', arbeitspreis: 34.5, grundpreis: 11.9, abschlag: 70 }], checks: {} },
+      { anbieter: 'Musterstrom', tarif: 'Grün 12', beginn: '2025-03-01', ende: '2026-02-28', frist: { wert: 6, einheit: 'wochen' }, preisgarantie: '2026-02-28',
+        bonus: { betrag: 80, art: 'neukunde', erhalten: '2026-03-20' }, kundennr: '400 123 987', zaehlernr: '1ESY1160123456',
+        preise: [{ ab: '2025-03-01', arbeitspreis: 31.9, grundpreis: 12.5, abschlag: 66 }],
+        checks: { abschluss: '2025-01-10', kuendigung: '2025-01-10', lieferbeginn: '2025-01-20', gemeldet: '2025-03-02', lastschrift: '2025-04-03', schluss: '2025-04-20' } },
+      { anbieter: 'Beispiel Energie', tarif: 'Klar 24', beginn: '2026-03-01', ende: '2027-02-28', frist: { wert: 6, einheit: 'wochen' }, preisgarantie: '2027-02-28',
+        bonus: { betrag: 60, art: 'sofort', erhalten: null }, kundennr: '77-551-204', zaehlernr: '1ESY1160123456',
+        kontakt: { web: 'https://example.com', tel: '0800 123 456', mail: '' },
+        preise: [{ ab: '2026-03-01', arbeitspreis: 29.8, grundpreis: 13.9, abschlag: 64 }],
+        checks: { abschluss: '2026-01-05', kuendigung: '2026-01-05', lieferbeginn: '2026-01-19', gemeldet: '2026-03-02' } },
+    ],
+    readings,
+  });
+}
+
+// ================= Format & Helfer =================
+const fmtN = (v, d = 0) => v.toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmtEur = (v, d = 2) => fmtN(v, d) + ' €';
+const fmtKwh = v => fmtN(Math.round(v)) + ' kWh';
+const fmtD = s => s.slice(8, 10) + '.' + s.slice(5, 7) + '.' + s.slice(0, 4);
+const fmtDs = s => s.slice(8, 10) + '.' + s.slice(5, 7) + '.' + s.slice(2, 4);
+const signEur = (v, d = 0) => (v >= 0 ? '+' : '−') + fmtN(Math.abs(v), d) + ' €';
+const MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const MONL = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const WTAG = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const monLabel = k => MON[+k.slice(5, 7) - 1];
+const standFmt = v => fmtN(v, v % 1 ? 1 : 0);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const icon = (id, s = 20) => `<svg width="${s}" height="${s}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+function showMsg(el, text, cls) { if (!el) return; el.textContent = text || ''; el.className = 'msg ' + (cls || ''); el.hidden = !text; }
+let toastT;
+function toast(t) { const el = $('toast'); el.innerHTML = icon('check', 18) + `<span>${esc(t)}</span>`; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600); }
+const daysBetween = (a, b) => dn(b) - dn(a);
+const relDays = n => n === 0 ? 'heute' : n === 1 ? 'morgen' : n === -1 ? 'gestern' : n > 0 ? `in ${n} Tagen` : `vor ${-n} Tagen`;
+const periodLabel = p => p.S.slice(2, 4) + '/' + ds(dn(p.E) - 1).slice(2, 4);
+const contractName = c => c.anbieter || 'Stromvertrag ab ' + fmtDs(c.beginn);
+function initials(c) { const n = (c.anbieter || 'Strom').replace(/[^\p{L}\p{N} ]/gu, ' ').trim().split(/\s+/); return ((n[0] || 'S')[0] + (n[1] ? n[1][0] : (n[0][1] || ''))).toUpperCase(); }
+function hue(c) { let h = 0; for (const ch of (c.anbieter || c.beginn)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return 1 + h % 6; }
+const avatar = (c, size = '') => `<div class="avatar ${size}" style="--pc:var(--p${hue(c)});--ps:var(--p${hue(c)}s)" aria-hidden="true">${esc(initials(c))}</div>`;
+function ringSvg(frac, color, size = 74, stroke = 7) {
+  const r = (size - stroke) / 2, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, frac));
+  return `<svg viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--surface)" stroke-width="${stroke}"/><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${c * f} ${c}"/></svg>`;
+}
+
+// ================= Speicher =================
+const KEY = 'zaehlerbuch.daten.v3', OLD_KEY = 'zaehlerbuch.daten.v2', PREF = 'zaehlerbuch.prefs';
+const store = {
+  load() {
+    try {
+      const v = localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY);
+      return v ? sanitize(JSON.parse(v)) : null;
+    } catch { return null; }
+  },
+  save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); localStorage.removeItem(OLD_KEY); return true; } catch { return false; } },
+  clear() { try { localStorage.removeItem(KEY); localStorage.removeItem(OLD_KEY); } catch {} },
+  prefs() { try { return JSON.parse(localStorage.getItem(PREF)) || {}; } catch { return {}; } },
+  setPref(k, v) { const p = this.prefs(); p[k] = v; try { localStorage.setItem(PREF, JSON.stringify(p)); } catch {} },
+};
+
+const app = { state: null, demo: false, tab: 'home', period: null, M: null, calcs: [], periods: [], pendingWarn: null, confirmDel: null, storageOk: true, lastTab: null, shown: {} };
+
+function commit(s, msg) {
+  app.state = s;
+  if (!app.demo) {
+    app.storageOk = store.save(s);
+    if (!app.storageOk) toast('Speichern nicht möglich. Bitte eine Sicherung anlegen.');
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  }
+  render();
+  if (msg) { toast(msg); if (navigator.vibrate && navigator.userActivation?.hasBeenActive) navigator.vibrate(12); }
+}
+
+// ================= Rendern =================
+function render() {
+  const s = app.state;
+  app.M = buildModel(s);
+  const M = app.M;
+  app.periods = listPeriods(M);
+  const today = dn(todayStr());
+  app.curIdx = app.periods.findIndex(p => dn(p.S) <= today && today < dn(p.E));
+  if (app.curIdx < 0) app.curIdx = app.periods.length - 1;
+  if (!app.period || !app.periods.some(p => p.S === app.period)) app.period = app.periods[app.curIdx].S;
+  app.calcs = app.periods.map(p => calcPeriod(M, p));
+  $('demoBar').hidden = !app.demo;
+  renderHeader();
+  const cur = currentContract(M), dl = kuendigenBis(cur), up = upcomingContract(M);
+  const badge = (dl && !up && daysBetween(todayStr(), dl) <= 60 && daysBetween(todayStr(), dl) >= 0);
+  document.querySelectorAll('[data-tab]').forEach(b => {
+    b.setAttribute('aria-selected', String(b.dataset.tab === app.tab));
+    const has = b.querySelector('.badge');
+    if (b.dataset.tab === 'vertraege' && badge && !has) b.insertAdjacentHTML('beforeend', '<i class="badge" aria-label="Kündigungsfrist läuft"></i>');
+    if ((!badge || b.dataset.tab !== 'vertraege') && has) has.remove();
+  });
+  const entering = app.lastTab !== app.tab;
+  document.querySelectorAll('[data-panel]').forEach(p => {
+    p.hidden = p.dataset.panel !== app.tab;
+    if (p.hidden) p.innerHTML = '';
+    p.classList.toggle('enter', !p.hidden && entering);
+  });
+  app.lastTab = app.tab;
+  ({ home: renderHome, verlauf: renderVerlauf, vertraege: renderVertraege, statistik: renderStatistik, einstellungen: renderSettings })[app.tab]();
+  countUp();
+}
+function renderHeader() {
+  const s = app.state, h = new Date().getHours();
+  const greet = h < 11 ? 'Guten Morgen' : h < 18 ? 'Hallo' : 'Guten Abend';
+  $('hello').textContent = s.profil.name ? `${greet}, ${s.profil.name}` : greet;
+  const t = new Date();
+  $('helloSub').textContent = `${WTAG[t.getDay()]}, ${t.getDate()}. ${MONL[t.getMonth()]}`;
+}
+// Zahlen beim ersten Anzeigen hochzählen lassen
+function countUp() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const target = +el.dataset.count, key = el.dataset.key || '';
+    if (app.shown[key] === target) return;
+    app.shown[key] = target;
+    const prefix = el.dataset.prefix || '', suffix = el.dataset.suffix || '';
+    const t0 = performance.now(), dur = 700;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur), v = target * (1 - Math.pow(1 - p, 3));
+      el.textContent = prefix + fmtN(Math.round(v)) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+// ---------- Übersicht ----------
+function renderHome() {
+  const s = app.state, M = app.M, c = app.calcs[app.curIdx], prev = app.calcs[app.curIdx - 1];
+  const el = document.querySelector('[data-panel="home"]');
+  const out = [];
+  out.push(noticesHtml(M));
+  const today = todayStr();
+  const showBill = prev && prev.complete && daysBetween(ds(prev.e), today) <= 150 && c.knownDays < 90;
+  if (showBill) {
+    out.push(`<div class="cols wide"><div class="stack">${billHero(prev)}</div><div class="stack">${forecastCard(c, M, true)}</div></div>`);
+  } else out.push(forecastCard(c, M, false));
+  if (!c.noForecast) {
+    const curAb = M.tarifAt(dn(today)).abschlag;
+    out.push(`<div class="tiles">
+      <div class="tile"><span class="ic">${icon('bolt', 16)}</span><span class="v">${fmtN(c.kwh / c.totalDays, 1)}<small>kWh</small></span><span class="k">pro Tag</span></div>
+      <div class="tile"><span class="ic">${icon('receipt', 16)}</span><span class="v">${fmtN(c.cost / c.totalDays, 2)}<small>€</small></span><span class="k">Kosten pro Tag</span></div>
+      <div class="tile"><span class="ic">${icon('chart', 16)}</span><span class="v">${fmtN(c.kwh)}<small>kWh</small></span><span class="k">${c.complete ? 'im Abrechnungsjahr' : 'erwartet im Jahr'}</span></div>
+      <div class="tile"><span class="ic">${icon('target', 16)}</span><span class="v">${fmtN(c.fitAbschlag)}<small>€</small></span><span class="k">passender Abschlag · jetzt ${fmtEur(curAb)}</span></div>
+    </div>`);
+  }
+  const left = [contractMini(M), recentCard(M)], right = [goalCard(c, prev), compareCardSmall(M, c)];
+  if (!app.demo) {
+    const ls = s.meta.letzteSicherung, age = ls ? daysBetween(ls, today) : null;
+    if (age == null || age > 30) right.push(`<div class="notice warn"><div class="ico">${icon('save', 22)}</div><div class="txt"><b>${age == null ? 'Noch keine Sicherung' : `Letzte Sicherung vor ${age} Tagen`}</b><span>Deine Daten liegen nur auf diesem Gerät. Eine Sicherungsdatei schützt sie.</span></div><button class="btn sm" type="button" data-act="backup">Sichern</button></div>`);
+  }
+  out.push(`<div class="cols"><div class="stack">${left.join('')}</div><div class="stack">${right.join('')}</div></div>`);
+  el.innerHTML = out.join('');
+}
+
+function noticesHtml(M) {
+  const s = app.state, today = todayStr(), list = [];
+  const cur = currentContract(M), up = upcomingContract(M), dl = kuendigenBis(cur);
+  if (dl && !up) {
+    const n = daysBetween(today, dl);
+    if (n >= 0 && n <= 60) list.push(`<div class="notice ${n <= 14 ? 'bad' : 'warn'}"><div class="ico">${icon('clock', 22)}</div><div class="txt"><b>${n === 0 ? 'Heute letzter Tag zum Kündigen' : `Noch ${n} Tage zum Kündigen`}</b><span>${esc(contractName(cur))} läuft bis ${fmtD(cur.ende)}. Kündigung muss bis ${fmtD(dl)} ankommen.</span></div><button class="btn sm" type="button" data-goto="vertraege">Ansehen</button></div>`);
+  }
+  if (up) {
+    const n = daysBetween(today, up.beginn), cl = checklistFor(M, up);
+    list.push(`<div class="notice accent"><div class="ico">${icon('swap', 22)}</div><div class="txt"><b>Wechsel zu ${esc(contractName(up))} ${relDays(n)}</b><span>Lieferbeginn ${fmtD(up.beginn)} · Checkliste ${cl.done} von ${cl.total} erledigt</span></div><button class="btn primary sm" type="button" data-goto="vertraege">Checkliste</button></div>`);
+  } else if (M.C.length > 1) {
+    const cl = checklistFor(M, cur), since = daysBetween(cur.beginn, today);
+    if (since >= 0 && since <= 150 && cl.done < cl.total) list.push(`<div class="notice accent"><div class="ico">${icon('swap', 22)}</div><div class="txt"><b>Wechsel zu ${esc(contractName(cur))}: ${cl.done} von ${cl.total} erledigt</b><span>Noch offen: ${esc(cl.items.find(i => !i.done).t)}</span></div><button class="btn sm" type="button" data-goto="vertraege">Checkliste</button></div>`);
+  }
+  const due = nextDue(s, M), dd = daysBetween(today, due);
+  if (M.R.length && dd <= 3) list.push(`<div class="notice accent"><div class="ico">${icon('bell', 22)}</div><div class="txt"><b>${dd <= 0 ? 'Ablesung fällig' : 'Bald ablesen'}</b><span>${dd < 0 ? `Die nächste Ablesung war am ${fmtD(due)} dran.` : dd === 0 ? 'Heute ist Ablesetag.' : `Nächste Ablesung ${relDays(dd)}, am ${fmtD(due)}.`}</span></div><button class="btn primary sm" type="button" data-act="read">Jetzt ablesen</button></div>`);
+  return list.join('');
+}
+
+function billHero(p) {
+  const pos = p.diff >= 0, c = p.contract;
+  return `<div class="card hero bill" style="--hero-tint:var(--${pos ? 'good' : 'bad'})">
+    <div class="card-head"><span class="eyebrow">Abrechnung ${periodLabel(p)} · ${fmtDs(p.S)} – ${fmtDs(ds(p.e - 1))}</span><span class="pill ${pos ? 'good' : 'bad'}"><span class="dot"></span>${pos ? 'Guthaben' : 'Nachzahlung'}</span></div>
+    <div style="display:flex;gap:14px;align-items:center">${avatar(c, 'sm')}<span class="muted small">Die Jahresrechnung von <b style="color:var(--fg)">${esc(contractName(c))}</b> sollte bald kommen. So sollte sie ungefähr aussehen:</span></div>
+    <div class="hero-amount ${pos ? 'pos' : 'neg'}" data-count="${Math.round(Math.abs(p.diff))}" data-key="bill${p.S}" data-prefix="${pos ? '+' : '−'}" data-suffix=" €">${signEur(p.diff)}</div>
+    <div class="breakdown">
+      <div><span class="k">Verbrauch</span><span class="v">${fmtKwh(p.kwh)}</span></div>
+      <div><span class="k">Kosten</span><span class="v">${fmtEur(p.cost, 0)}</span></div>
+      <div><span class="k">Abschläge${p.bonusInBill ? ' + Bonus' : ''}</span><span class="v">${fmtEur(p.abschlaege + p.bonusInBill, 0)}</span></div>
+    </div>
+    <p class="small muted">Komplett gemessen, ${fmtN(p.cost / p.kwh * 100, 1)} ct pro kWh inklusive Grundpreis. Kommt die Rechnung mit einem anderen Betrag, lohnt ein genauer Blick.</p>
+  </div>`;
+}
+
+function bandHtml(c) {
+  const ext = Math.max(Math.abs(c.lo), Math.abs(c.hi), 20) * 1.25;
+  const x = v => 50 + v / ext * 50;
+  const lo = x(c.lo), hi = x(c.hi), mid = x(c.diff);
+  return `<div class="band" role="img" aria-label="Erwartetes Ergebnis zwischen ${signEur(c.lo)} und ${signEur(c.hi)}">
+    <div class="band-track"><div class="band-axis"></div><div class="band-zero" style="left:50%"></div>
+      <div class="band-range" style="left:${lo}%;width:${Math.max(1, hi - lo)}%"></div>
+      <div class="band-dot" style="left:${mid}%;background:var(--${c.diff >= 0 ? 'good' : 'bad'})"></div></div>
+    <div class="band-labels"><span>◀ Nachzahlung</span><span>0 €</span><span>Guthaben ▶</span></div>
+  </div>`;
+}
+
+function forecastCard(c, M, compact) {
+  const range = `${fmtDs(c.S)} – ${fmtDs(ds(c.e - 1))}`;
+  if (c.noForecast) {
+    const lastR = M.R[M.R.length - 1];
+    return `<div class="card hero"><span class="eyebrow">Abrechnungsjahr ${periodLabel(c)} · ${range}</span>
+      <h2 style="font-size:1.5rem">Noch keine Prognose</h2>
+      <p class="hero-text">Ab der zweiten Ablesung rechnet das Zählerbuch aus, ob du eine Nachzahlung oder ein Guthaben bekommst.${lastR ? ` Nächste Ablesung am besten um den ${fmtD(nextDue(app.state, M))}.` : ''}</p>
+      ${lastR ? `<div class="meterline">Erster Zählerstand: <b class="num" style="color:var(--fg)">${standFmt(lastR.stand)} kWh</b> am ${fmtD(lastR.datum)}</div>` : ''}
+      <button class="btn primary" type="button" data-act="read" style="justify-self:start">${icon('plus', 18)}Zähler ablesen</button></div>`;
+  }
+  const pos = c.diff >= 0, crosses = c.lo < 0 && c.hi > 0;
+  const label = c.complete ? (pos ? 'Guthaben' : 'Nachzahlung') : c.sicherheit === 'niedrig' ? 'Erste Einschätzung' : c.sicherheit === 'mittel' ? 'Prognose' : 'Recht sichere Prognose';
+  const pillCls = c.complete ? (pos ? 'good' : 'bad') : c.sicherheit === 'hoch' ? (pos ? 'good' : 'bad') : 'accent';
+  const big = c.complete || c.sicherheit !== 'niedrig';
+  const pct = c.knownDays / c.totalDays * 100;
+  const basis = c.how === 'vorjahr' ? 'deinem Verbrauch im Vorjahr' : c.how === 'mix' ? 'Vorjahr und Durchschnitt' : `deinem Durchschnitt von ${fmtN(M.avgRate, 1)} kWh pro Tag`;
+  let text;
+  if (c.complete) text = pos ? `Deine Abschläge waren höher als die Kosten. Du bekommst etwa ${fmtEur(c.diff, 0)} zurück.` : `Deine Abschläge haben nicht gereicht. Rechne mit etwa ${fmtEur(-c.diff, 0)} Nachzahlung.`;
+  else {
+    text = crosses ? `Noch offen: irgendwo zwischen ${fmtEur(-c.lo, 0)} Nachzahlung und ${fmtEur(c.hi, 0)} Guthaben.` : `Wahrscheinlich zwischen ${signEur(c.lo)} und ${signEur(c.hi)}.`;
+    text += c.knownDays === 0 ? ` Noch kein Tag gemessen, Grundlage ist ${basis}.` : ` ${c.knownDays} von ${c.totalDays} Tagen gemessen, der Rest geschätzt aus ${basis}.`;
+    const curAb = M.tarifAt(dn(todayStr())).abschlag;
+    if (c.fitAbschlag > curAb + 2 && !crosses) text += ` Mit etwa ${fmtN(c.fitAbschlag)} € Abschlag wärst du auf der sicheren Seite.`;
+  }
+  const max = Math.max(...c.months.map(m => m.known + m.est), 1);
+  const spark = c.months.map(m => { const tot = m.known + m.est; return `<i class="${m.est > m.known ? 'est' : ''}" style="height:${Math.max(4, tot / max * 100)}%" title="${MONL[+m.key.slice(5, 7) - 1]}: ${fmtKwh(tot)}"></i>`; }).join('');
+  const labels = c.months.map(m => `<span>${monLabel(m.key).slice(0, 1)}</span>`).join('');
+  const amount = Math.round(Math.abs(c.diff));
+  return `<div class="card hero">
+    <div class="card-head"><span class="eyebrow">${compact ? 'Neues Jahr ' : 'Abrechnungsjahr '}${periodLabel(c)} · ${range}</span><span class="pill ${pillCls}"><span class="dot"></span>${label}</span></div>
+    <div class="hero-amount ${big && !compact ? '' : 'mid'} ${pos ? 'pos' : 'neg'}">${c.complete ? '' : '<span class="approx">≈</span>'}<span data-count="${amount}" data-key="fc${c.S}" data-prefix="${pos ? '+' : '−'}" data-suffix=" €">${signEur(c.diff)}</span></div>
+    ${c.complete ? '' : bandHtml(c)}
+    <p class="hero-text${compact ? ' small' : ''}">${text}</p>
+    ${compact ? '' : `<div class="spark" aria-hidden="true">${spark}</div><div class="spark-labels" aria-hidden="true">${labels}</div>`}
+    ${c.complete ? '' : `<div style="display:grid;gap:6px"><div class="progress"><i style="width:${pct}%"></i></div><span class="meterline">Genauigkeit wächst mit jeder Ablesung · ${fmtN(pct)} % gemessen</span></div>`}
+  </div>`;
+}
+
+function contractMini(M) {
+  const c = currentContract(M), dl = kuendigenBis(c), t = M.tarifAt(dn(todayStr()));
+  let line = c.ende ? `Läuft bis ${fmtD(c.ende)}` : 'Laufzeit nicht eingetragen';
+  if (dl) { const n = daysBetween(todayStr(), dl); line += n >= 0 ? ` · Kündigen bis ${fmtD(dl)} (${relDays(n)})` : ' · Kündigungsfrist vorbei'; }
+  return `<div class="card hov" style="cursor:pointer" data-goto="vertraege" role="button" tabindex="0" aria-label="Vertrag ansehen">
+    <div class="card-head"><h2>Dein Vertrag</h2><span class="link-btn">Details ${icon('arrow', 16)}</span></div>
+    <div class="contract-head">${avatar(c)}<div class="t"><b style="font-size:1.05rem">${esc(contractName(c))}</b><span class="sub">${esc(c.tarif ? c.tarif + ' · ' : '')}${fmtN(t.arbeitspreis, 2)} ct/kWh · ${fmtEur(t.abschlag)} Abschlag</span></div></div>
+    <span class="meterline">${icon('clock', 16)}${line}</span>
+    ${!c.anbieter ? `<span class="pill warn">Anbieter und Laufzeit noch nicht eingetragen</span>` : ''}
+  </div>`;
+}
+
+function goalCard(c, prev) {
+  const z = app.state.ziel.kwh;
+  if (!z) {
+    const sug = prev && prev.complete ? Math.round(prev.kwh * 0.9 / 10) * 10 : null;
+    return `<div class="card"><div class="card-head"><h2>Sparziel</h2><span style="color:var(--accent)">${icon('target', 22)}</span></div>
+      <p class="muted">Setz dir ein Ziel für dein Abrechnungsjahr. Das Zählerbuch zeigt dir, ob du auf Kurs bist.</p>
+      <div class="btns">${sug ? `<button class="btn soft sm" type="button" data-act="goal-suggest" data-v="${sug}">${fmtN(sug)} kWh (−10 % zum Vorjahr)</button>` : ''}<button class="btn sm" type="button" data-act="goto-goal">Eigenes Ziel</button></div></div>`;
+  }
+  if (c.noForecast) return `<div class="card"><div class="card-head"><h2>Sparziel</h2><span class="pill accent">${fmtKwh(z)}</span></div><p class="muted">Ab der zweiten Ablesung siehst du hier, ob du auf Kurs bist.</p></div>`;
+  const zz = z * c.totalDays / 365, over = c.kwh - zz, ok = over <= 0, remain = c.totalDays - c.knownDays;
+  const pctUsed = Math.min(100, c.kwhKnown / zz * 100), pctFc = Math.min(100, c.kwh / zz * 100);
+  let text;
+  if (c.complete) text = ok ? `Geschafft: ${fmtKwh(-over)} unter deinem Ziel.` : `Ziel um ${fmtKwh(over)} verfehlt.`;
+  else if (ok) text = `Du liegst auf Kurs, voraussichtlich ${fmtKwh(-over)} unter dem Ziel.`;
+  else text = `Voraussichtlich ${fmtKwh(over)} drüber. Dafür müsstest du ab jetzt ${fmtN(over / remain, 1)} kWh pro Tag weniger verbrauchen.`;
+  const col = ok ? 'var(--accent)' : 'var(--series-2)';
+  return `<div class="card"><div class="card-head"><h2>Sparziel</h2><span class="pill ${ok ? 'good' : 'warn'}"><span class="dot"></span>${ok ? 'auf Kurs' : 'drüber'}</span></div>
+    <div class="big-stat">${fmtN(c.kwh)} <small>von ${fmtN(zz)} kWh</small></div>
+    <div class="progress" style="height:10px;border-radius:5px" role="img" aria-label="${fmtN(pctFc)} Prozent des Ziels erwartet">
+      <i style="width:${pctFc}%;background:color-mix(in srgb, ${col} 30%, transparent);position:absolute;left:0;top:0"></i>
+      <i style="width:${pctUsed}%;background:${col};position:absolute;left:0;top:0"></i></div>
+    <p class="small muted">${text}</p></div>`;
+}
+function compareCardSmall(M, c) {
+  const b = yearBasis(M, c), p = app.state.profil;
+  if (!b) return `<div class="card"><div class="card-head"><h2>Einordnung</h2></div><p class="muted">Sobald genug Daten da sind, vergleicht das Zählerbuch deinen Verbrauch mit ähnlichen Haushalten.</p></div>`;
+  const rw = richtwert(p), r = b.kwh / rw;
+  const word = r < 0.8 ? 'sparsam' : r <= 1.15 ? 'im üblichen Bereich' : 'eher hoch';
+  return `<div class="card"><div class="card-head"><h2>Einordnung</h2><button class="link-btn" type="button" data-goto="statistik">Mehr ${icon('arrow', 16)}</button></div>
+    ${scaleHtml(b.kwh, rw)}
+    <p class="small muted">Mit ${fmtKwh(b.kwh)} pro Jahr bist du für ${p.personen === 5 ? '5 und mehr Personen' : p.personen === 1 ? '1 Person' : p.personen + ' Personen'} in ${p.wohnform === 'haus' ? 'einem Haus' : 'einer Wohnung'} <b style="color:var(--fg)">${word}</b>.</p></div>`;
+}
+function scaleHtml(kwh, rw) {
+  const max = Math.max(rw * 1.8, kwh * 1.12);
+  const z1 = rw * 0.8 / max * 100, z2 = (rw * 1.15 - rw * 0.8) / max * 100;
+  const you = Math.min(96, Math.max(4, kwh / max * 100)), ref = rw / max * 100;
+  return `<div class="scale-wrap">
+    <div class="scale-mark" style="left:${you}%"><span class="num">Du · ${fmtN(kwh)}</span><span class="dot"></span></div>
+    <div class="scale" aria-hidden="true"><i style="width:${z1}%;background:var(--good-soft)"></i><i style="width:${z2}%;background:var(--surface-3)"></i><i style="flex:1;background:var(--bad-soft)"></i></div>
+    <div class="scale-ref" style="left:${ref}%">typisch ${fmtN(rw)}</div>
+  </div><div class="scale-labels"><span>sparsam</span><span>üblich</span><span>hoch</span></div>`;
+}
+function recentCard(M) {
+  const rows = M.R.slice(-4).reverse(), ivBy = new Map(M.iv.map(x => [x.to.datum, x]));
+  return `<div class="card"><div class="card-head"><h2>Letzte Ablesungen</h2><button class="link-btn" type="button" data-goto="verlauf">Alle ${icon('arrow', 16)}</button></div>
+    ${rows.length ? `<div class="list">${rows.map(r => readingRow(r, ivBy.get(r.datum), false)).join('')}</div>` : '<div class="empty">Noch keine Ablesung.</div>'}</div>`;
+}
+function readingRow(r, x, actions) {
+  if (actions && app.confirmDel === r.datum) return `<div class="confirm"><span>Ablesung vom ${fmtD(r.datum)} löschen?</span><span class="btns"><button class="btn danger sm" type="button" data-act="del-yes" data-d="${r.datum}">Löschen</button><button class="btn sm" type="button" data-act="del-no">Behalten</button></span></div>`;
+  const d = r.datum;
+  return `<div class="li"><div class="daydot">${+d.slice(8, 10)}<small>${MON[+d.slice(5, 7) - 1]} ${d.slice(2, 4)}</small></div>
+    <div class="main"><b class="num">${standFmt(r.stand)} kWh</b><span>${x ? (actions ? `+${fmtN(x.kwh)} kWh · ${x.b - x.a} Tage · ${fmtN(x.rate, 1)} kWh/Tag` : `+${fmtN(x.kwh)} kWh in ${x.b - x.a} Tagen`) : 'erste Ablesung'}</span></div>
+    ${actions ? `<button class="icon-btn" type="button" data-act="edit" data-d="${d}" aria-label="Ablesung vom ${fmtD(d)} ändern">${icon('edit', 18)}</button><button class="icon-btn danger" type="button" data-act="del" data-d="${d}" aria-label="Ablesung vom ${fmtD(d)} löschen">${icon('trash', 18)}</button>` : `<div class="end">${x ? `<b>${fmtN(x.rate, 1)}</b><span>kWh/Tag</span>` : ''}</div>`}</div>`;
+}
+
+// ---------- Verlauf ----------
+function renderVerlauf() {
+  const M = app.M, idx = app.periods.findIndex(p => p.S === app.period), c = app.calcs[idx], prev = app.calcs[idx - 1];
+  const ivBy = new Map(M.iv.map(x => [x.to.datum, x]));
+  const seg = `<div class="seg" role="group" aria-label="Abrechnungsjahr">${app.periods.map(p => `<button type="button" data-period="${p.S}" aria-pressed="${p.S === app.period}">${periodLabel(p)}</button>`).join('')}</div>`;
+  let summary = '';
+  if (!c.noForecast) {
+    const pos = c.diff >= 0;
+    summary = `<div class="breakdown">
+      <div><span class="k">Verbrauch</span><span class="v">${fmtKwh(c.kwh)}</span><span class="k">${c.complete ? 'gemessen' : fmtKwh(c.kwhKnown) + ' gemessen'}</span></div>
+      <div><span class="k">Kosten${c.bonus ? ' nach Bonus' : ''}</span><span class="v">${fmtEur(c.netCost, 0)}</span><span class="k">${fmtN(c.netCost / c.kwh * 100, 1)} ct/kWh effektiv</span></div>
+      <div><span class="k">${c.complete ? 'Ergebnis' : 'Prognose'}</span><span class="v ${pos ? 'pos' : 'neg'}">${c.complete ? '' : '≈ '}${signEur(c.diff)}</span><span class="k">${fmtEur(c.abschlaege, 0)} Abschläge</span></div></div>`;
+  }
+  document.querySelector('[data-panel="verlauf"]').innerHTML = `
+    <div class="card">
+      <div class="card-head"><div style="display:flex;gap:12px;align-items:center;min-width:0">${avatar(c.contract, 'sm')}<div style="display:grid;min-width:0"><h2>Abrechnungsjahr ${periodLabel(c)}</h2><span class="small muted">${esc(contractName(c.contract))} · ${fmtDs(c.S)} – ${fmtDs(ds(c.e - 1))}</span></div></div>${seg}</div>
+      ${summary}
+    </div>
+    <div class="cols">
+      <div class="card"><div class="card-head"><h2>Verbrauch pro Monat</h2></div>
+        <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>gemessen</span><span><i class="sw hatch"></i>geschätzt</span><span><i class="sw line" style="background:var(--fg-2)"></i>Vorjahr</span></div>
+        <div class="chart" id="monthChart"></div></div>
+      <div class="card"><div class="card-head"><h2>Kosten gegen Abschläge</h2></div>
+        <div class="legend"><span><i class="sw line" style="background:var(--accent)"></i>Stromkosten, aufsummiert</span><span><i class="sw line" style="background:var(--series-2)"></i>gezahlte Abschläge</span></div>
+        <div class="chart" id="cumChart"></div></div>
+      <div class="card span"><div class="card-head"><h2>Alle Ablesungen</h2><span class="muted small">${M.R.length} Einträge</span></div>
+        ${M.R.length ? `<div class="list">${M.R.slice().reverse().map(r => readingRow(r, ivBy.get(r.datum), true)).join('')}</div>` : '<div class="empty">Noch keine Ablesung.</div>'}</div>
+    </div>`;
+  monthChart($('monthChart'), c, prev);
+  cumChart($('cumChart'), c, M);
+}
+
+// ---------- Verträge ----------
+function renderVertraege() {
+  const M = app.M, today = todayStr();
+  const cur = currentContract(M), up = upcomingContract(M);
+  // Checkliste gehört zum kommenden Vertrag oder, im ersten Jahr nach einem Wechsel, zum aktuellen.
+  const clc = up || (M.C.length > 1 && daysBetween(cur.beginn, today) <= 365 ? cur : null);
+  const side = [countdownCard(cur, up)];
+  if (clc) side.push(checklistCard(clc, M));
+  if (up) side.push(`<div class="card"><div class="switch-row"><div class="contract-head">${avatar(up, 'sm')}<div class="t"><b>${esc(contractName(up))}</b><span class="sub">kommt ab ${fmtD(up.beginn)}</span></div></div><button class="btn soft sm" type="button" data-act="edit-contract" data-id="${up.id}">Vertragsakte</button></div></div>`);
+  else side.push(`<div class="card"><div class="switch-row"><div style="display:grid;gap:2px;min-width:0;flex:1"><h2>Anbieter wechseln</h2><span class="small muted">Neuen Vertrag hier anlegen, ab Lieferbeginn gelten die neuen Preise.</span></div><button class="btn primary sm" type="button" data-act="new-contract">${icon('plus', 16)}Neuer Vertrag</button></div></div>`);
+  document.querySelector('[data-panel="vertraege"]').innerHTML =
+    `<div class="cols"><div class="stack">${contractCard(cur, M, 'current')}</div><div class="stack">${side.join('')}</div></div>` + historyHtml(M);
+}
+function contractCard(c, M, kind) {
+  const today = todayStr(), lastP = c.preise[c.preise.length - 1];
+  const t = kind === 'upcoming' ? c.preise[0] : M.tarifAt(dn(today));
+  let term = '';
+  if (c.ende) {
+    const total = daysBetween(c.beginn, c.ende) + 1, gone = Math.max(0, Math.min(total, daysBetween(c.beginn, today)));
+    const dl = kuendigenBis(c);
+    term = `<div class="term"><div class="term-bar" role="img" aria-label="Laufzeit zu ${fmtN(gone / total * 100)} Prozent vorbei"><i style="width:${gone / total * 100}%"></i>${dl ? `<span class="dl" style="left:${Math.max(0, Math.min(100, (daysBetween(c.beginn, dl) + 1) / total * 100))}%" title="Kündigen bis ${fmtD(dl)}"></span>` : ''}</div>
+      <div class="term-labels"><span>${fmtD(c.beginn)}</span>${dl ? `<span style="color:var(--series-2);font-weight:650">Kündigen bis ${fmtDs(dl)}</span>` : ''}<span>${fmtD(c.ende)}</span></div></div>`;
+  }
+  const facts = [
+    ['Arbeitspreis', fmtN(t.arbeitspreis, 2) + ' ct/kWh'], ['Grundpreis', fmtEur(t.grundpreis) + '/Monat'],
+    ['Abschlag', fmtEur(t.abschlag) + '/Monat'], ['Preisgarantie', c.preisgarantie ? 'bis ' + fmtD(c.preisgarantie) : '–'],
+  ];
+  for (const [k, l] of [['sofort', 'Sofortbonus'], ['neukunde', 'Neukundenbonus']]) { const b = c.bonus[k]; if (b.betrag) facts.push([l, fmtEur(b.betrag, 0) + (b.erhalten ? ' · erhalten' : ' · offen')]); }
+  facts.push(['Kündigungsfrist', c.frist.wert != null ? `${c.frist.wert} ${c.frist.einheit === 'monate' ? (c.frist.wert === 1 ? 'Monat' : 'Monate') : c.frist.einheit === 'tage' ? 'Tage' : (c.frist.wert === 1 ? 'Woche' : 'Wochen')}` : '–']);
+  const nums = [['Kundennummer', c.kundennr], ['Vertragsnummer', c.vertragsnr], ['Zählernummer', c.zaehlernr], ['Telefon', c.kontakt.tel], ['E-Mail', c.kontakt.mail]].filter(x => x[1]);
+  const web = c.kontakt.web && /^https?:\/\//i.test(c.kontakt.web) ? c.kontakt.web : c.kontakt.web ? 'https://' + c.kontakt.web : '';
+  return `<div class="card">
+    <div class="card-head"><span class="pill ${kind === 'upcoming' ? 'accent' : 'good'}"><span class="dot"></span>${kind === 'upcoming' ? 'Kommt ab ' + fmtD(c.beginn) : 'Aktueller Vertrag'}</span><button class="icon-btn" type="button" data-act="edit-contract" data-id="${c.id}" aria-label="Vertrag bearbeiten">${icon('edit', 18)}</button></div>
+    <div class="contract-head">${avatar(c, 'lg')}<div class="t"><h2>${esc(contractName(c))}</h2><span class="sub">${esc(c.tarif || 'Tarif nicht eingetragen')} · seit ${fmtD(c.beginn)}</span></div></div>
+    ${!c.anbieter || !c.ende ? `<button class="notice warn" type="button" data-act="edit-contract" data-id="${c.id}" style="border:0;text-align:left;cursor:pointer"><div class="ico">${icon('edit', 20)}</div><div class="txt"><b>Vertragsakte vervollständigen</b><span>Anbieter, Laufzeit und Kündigungsfrist eintragen, dann erinnert dich das Zählerbuch rechtzeitig.</span></div></button>` : ''}
+    ${term}
+    <div class="facts">${facts.map(f => `<div><span class="k">${f[0]}</span><span class="v">${esc(f[1])}</span></div>`).join('')}</div>
+    ${c.preise.length > 1 ? `<p class="small muted">${c.preise.length - 1} Preisänderung${c.preise.length > 2 ? 'en' : ''} im Vertrag, zuletzt ab ${fmtD(lastP.ab)}.</p>` : ''}
+    ${nums.length ? `<div>${nums.map(n => `<div class="copyrow"><span class="k">${n[0]}</span><span class="v">${esc(n[1])}</span><button class="icon-btn" type="button" data-act="copy" data-v="${esc(n[1])}" aria-label="${n[0]} kopieren">${icon('copy', 17)}</button></div>`).join('')}</div>` : ''}
+    ${web ? `<a class="btn soft" href="${esc(web)}" target="_blank" rel="noopener" style="justify-self:start">Kundenportal öffnen</a>` : ''}
+    ${c.notiz ? `<p class="small" style="white-space:pre-wrap;color:var(--fg-2);background:var(--surface-2);padding:12px 14px;border-radius:var(--radius-sm)">${esc(c.notiz)}</p>` : ''}
+  </div>`;
+}
+function countdownCard(c, up) {
+  const dl = kuendigenBis(c), today = todayStr();
+  if (!c.ende) return `<div class="card"><div class="card-head"><h2>Kündigung</h2></div><div class="empty">${icon('clock', 28)}<span>Trag Laufzeitende und Kündigungsfrist ein. Dann zählt das Zählerbuch die Tage bis zur Frist herunter und erinnert dich.</span><button class="btn soft sm" type="button" data-act="edit-contract" data-id="${c.id}">Laufzeit eintragen</button></div></div>`;
+  if (up) return `<div class="card"><div class="card-head"><h2>Kündigung</h2><span class="pill good"><span class="dot"></span>Wechsel geplant</span></div><p class="small muted">Dein neuer Vertrag bei ${esc(contractName(up))} beginnt am ${fmtD(up.beginn)}.</p></div>`;
+  if (!dl) return `<div class="card"><div class="card-head"><h2>Kündigung</h2></div><p class="small muted">Vertrag läuft bis ${fmtD(c.ende)}. Trag noch die Kündigungsfrist ein.</p><button class="btn soft sm" type="button" data-act="edit-contract" data-id="${c.id}" style="justify-self:start">Frist eintragen</button></div>`;
+  const n = daysBetween(today, dl), window = Math.max(1, daysBetween(c.beginn, dl));
+  if (n < 0) {
+    const ended = daysBetween(c.ende, today) >= 0;
+    return `<div class="card"><div class="card-head"><h2>Kündigung</h2><span class="pill warn"><span class="dot"></span>Frist vorbei</span></div>
+      <p class="small" style="color:var(--fg-2)">${ended ? `Die Erstlaufzeit ist am ${fmtD(c.ende)} ausgelaufen.` : `Die Frist war am ${fmtD(dl)}.`} Ohne Kündigung verlängert sich der Vertrag. Seit 2022 sind solche Verträge in der Regel <b>mit einem Monat Frist</b> kündbar. Prüf das in deinen Vertragsunterlagen.</p>
+      <button class="btn soft sm" type="button" data-act="new-contract" style="justify-self:start">${icon('swap', 16)}Neuen Vertrag anlegen</button></div>`;
+  }
+  const cls = n <= 14 ? 'bad' : n <= 60 ? 'warn' : '';
+  const col = n <= 14 ? 'var(--bad)' : n <= 60 ? 'var(--warn)' : 'var(--accent)';
+  return `<div class="card"><div class="card-head"><h2>Kündigungs-Countdown</h2></div>
+    <div class="countdown ${cls}"><div class="ring">${ringSvg(n / window, col)}<span>${n}<small>${n === 1 ? 'Tag' : 'Tage'}</small></span></div>
+      <div class="txt"><b>Kündigen bis ${fmtD(dl)}</b><span>Die Kündigung muss bis dahin beim Anbieter sein. Vertragsende ${fmtD(c.ende)}.</span></div></div>
+    <p class="small muted">Tipp: Der neue Anbieter kündigt meist für dich, wenn du beim Abschluss den alten Vertrag angibst.</p>
+    <button class="btn soft" type="button" data-act="ics-kuendigung" data-id="${c.id}" style="justify-self:start">${icon('bell', 18)}Frist in den Kalender eintragen</button></div>`;
+}
+function checklistCard(c, M) {
+  const cl = checklistFor(M, c), open = app.ckOpen === c.id, next = cl.items.find(i => !i.done);
+  const ring = `<div class="ring-sm">${ringSvg(cl.done / cl.total, 'var(--accent)', 46, 5).replace('stroke="var(--surface)"', 'stroke="var(--surface-2)"')}<span>${cl.done}/${cl.total}</span></div>`;
+  return `<div class="card"><div class="ck-head"><div class="who">${ring}<div><h2>Wechsel-Checkliste</h2><span class="small muted">${next ? 'Offen: ' + esc(next.t) : 'Alles erledigt'}</span></div></div>
+      <button class="btn sm" type="button" data-act="ck-toggle" data-id="${c.id}" aria-expanded="${open}">${open ? 'Einklappen' : 'Anzeigen'}</button></div>
+    ${open ? `<div class="checklist">${cl.items.map(i => `<button type="button" class="ck" role="checkbox" aria-checked="${i.done}" data-act="check" data-id="${c.id}" data-k="${i.k}" ${i.auto ? 'disabled style="cursor:default"' : ''}>
+      <span class="box">${icon('check', 16)}</span><span class="t"><b>${esc(i.t)}</b><span>${i.auto ? 'Automatisch erkannt' : c.checks[i.k] ? 'Erledigt am ' + fmtD(c.checks[i.k]) : i.bonus && c.bonus[i.bonus].erhalten ? 'Erhalten am ' + fmtD(c.bonus[i.bonus].erhalten) : esc(i.h)}</span></span></button>`).join('')}</div>` : ''}</div>`;
+}
+function historyHtml(M) {
+  const rows = M.C.slice().reverse().map(c => {
+    const pers = app.calcs.filter(p => p.cid === c.id && !p.noForecast);
+    const kwh = pers.reduce((a, p) => a + p.kwh, 0), net = pers.reduce((a, p) => a + p.netCost, 0), diff = pers.reduce((a, p) => a + p.diff, 0);
+    const allDone = pers.length && pers.every(p => p.complete);
+    return { c, pers, kwh, net, diff, eff: kwh ? net / kwh * 100 : null, allDone };
+  });
+  const effs = rows.filter(r => r.eff != null);
+  const maxEff = Math.max(...effs.map(r => r.eff), 1);
+  const today = dn(todayStr());
+  return `<h2 class="section-title">Anbieter-Historie</h2><p class="section-sub">Alle deine Stromverträge und was sie dich wirklich gekostet haben.</p>
+  <div class="cols wide">
+    <div class="card"><div class="timeline">${rows.map(r => {
+      const c = r.c, endTxt = c.ende ? fmtDs(c.ende) : 'offen', future = c.d > today;
+      return `<div class="tl">${avatar(c)}<div class="body">
+        <div class="row1"><b>${esc(contractName(c))}</b>${future ? '<span class="pill accent">kommt</span>' : r.pers.length ? `<span class="pill ${r.diff >= 0 ? 'good' : 'bad'}">${r.allDone ? '' : '≈ '}${signEur(r.diff)}</span>` : ''}</div>
+        <span class="meta">${esc(c.tarif ? c.tarif + ' · ' : '')}${fmtDs(c.beginn)} – ${endTxt}</span>
+        <div class="stats">${r.eff != null ? `<span>${fmtN(r.eff, 1)} ct/kWh effektiv</span><span>${fmtKwh(r.kwh)}</span><span>${fmtEur(r.net, 0)}${bonusTotal(c) ? ' nach Bonus' : ''}</span>` : `<span>${fmtN(c.preise[0].arbeitspreis, 2)} ct/kWh</span>`}${bonusTotal(c) ? `<span>${icon('gift', 12)} ${fmtEur(bonusTotal(c), 0)} Bonus</span>` : ''}</div>
+        <button class="link-btn" type="button" data-act="edit-contract" data-id="${c.id}" style="justify-self:start">Vertragsakte ${icon('arrow', 14)}</button>
+      </div></div>`;
+    }).join('')}</div></div>
+    <div class="card"><div class="card-head"><h2>Echter Preis pro kWh</h2></div>
+      <p class="small muted">Alles eingerechnet: Arbeitspreis, Grundpreis und Bonus, geteilt durch deinen Verbrauch.</p>
+      ${effs.length ? `<div style="display:grid;gap:10px">${effs.slice().reverse().map(r => `<div class="pricebar"><span class="lab">${esc(initials(r.c))} ${r.c.beginn.slice(2, 4)}</span><i style="width:${r.eff / maxEff * 100}%;background:var(--p${hue(r.c)})"></i><span class="val">${fmtN(r.eff, 1)} ct</span></div>`).join('')}</div>` : '<div class="empty">Braucht mindestens zwei Ablesungen.</div>'}
+      ${effs.length >= 2 ? (() => { const a = effs[effs.length - 1], b = effs[0]; const d = b.eff - a.eff; return `<p class="small" style="color:var(--fg-2)">${d < 0 ? `Dein aktueller Vertrag ist <b>${fmtN(-d, 1)} ct pro kWh günstiger</b> als dein erster im Zählerbuch.` : `Dein aktueller Vertrag ist ${fmtN(d, 1)} ct pro kWh teurer als dein erster im Zählerbuch.`}</p>`; })() : ''}
+    </div>
+  </div>`;
+}
+
+// ---------- Statistik ----------
+function renderStatistik() {
+  const M = app.M, s = app.state, c = app.calcs[app.curIdx];
+  const months = calendarMonths(M), html = [];
+  const b = yearBasis(M, c), rw = richtwert(s.profil), cards = [], einordnung = [];
+  if (b) {
+    const diffPct = Math.round((b.kwh / rw - 1) * 100);
+    einordnung.push(`<div class="card"><div class="card-head"><h2>Ähnliche Haushalte</h2><button class="link-btn" type="button" data-goto="einstellungen">Haushalt ändern</button></div>${scaleHtml(b.kwh, rw)}
+      <p class="small muted">Du verbrauchst ${diffPct === 0 ? 'genau so viel wie' : `${Math.abs(diffPct)} % ${diffPct < 0 ? 'weniger' : 'mehr'} als`} ein typischer Haushalt mit ${s.profil.personen === 5 ? '5+' : s.profil.personen} ${s.profil.personen === 1 ? 'Person' : 'Personen'} in ${s.profil.wohnform === 'haus' ? 'einem Haus' : 'einer Wohnung'} (${fmtKwh(rw)}). Grobe Richtwerte für Deutschland, ohne Warmwasser über Strom.</p></div>`);
+    const co2 = b.kwh * s.profil.co2 / 1000;
+    einordnung.push(`<div class="card"><div class="card-head"><h2>CO₂-Fußabdruck</h2><span style="color:var(--accent)">${icon('leaf', 22)}</span></div>
+      <div class="big-stat">${fmtN(co2)} <small>kg CO₂ im Jahr</small></div>
+      <div class="duo"><div><span class="v">${fmtN(co2 / 12)}</span><span class="k">kg pro Monat</span></div><div><span class="v">${fmtN(co2 / 365, 1)}</span><span class="k">kg pro Tag</span></div></div>
+      <p class="small muted">Gerechnet mit ${fmtN(s.profil.co2)} g CO₂ pro kWh (deutscher Strommix, ca.). Bei Ökostrom steht der Wert auf deiner Rechnung, du kannst ihn unter „Mehr“ ändern.</p></div>`);
+  } else einordnung.push(`<div class="card span"><div class="empty">Ab der zweiten Ablesung siehst du hier, wie dein Verbrauch dasteht.</div></div>`);
+  const byKey = new Map(months.map(m => [m.key, m]));
+  const yoy = months.filter(m => m.complete).map(m => { const p = byKey.get(String(+m.key.slice(0, 4) - 1) + m.key.slice(4)); return p && p.complete ? { key: m.key, now: m.kwh, prev: p.kwh, pct: (m.kwh - p.kwh) / p.kwh * 100 } : null; }).filter(Boolean).slice(-12);
+  cards.push(`<div class="card"><div class="card-head"><h2>Gegenüber dem Vorjahr</h2></div>${yoy.length ? `<div class="legend"><span><i class="sw" style="background:var(--accent)"></i>weniger als im Vorjahr</span><span><i class="sw" style="background:var(--series-2)"></i>mehr</span></div><div class="chart" id="yoyChart"></div>` : '<div class="empty">Sobald ein Monat zwei Jahre hintereinander komplett gemessen ist, siehst du hier, ob du mehr oder weniger verbrauchst.</div>'}</div>`);
+  const roll = rollingYear(M);
+  cards.push(`<div class="card"><div class="card-head"><h2>Trend: Jahresverbrauch</h2></div>${roll.length >= 2 ? `<p class="small muted">Verbrauch der jeweils letzten 12 Monate. Fällt die Linie, sparst du dauerhaft.</p><div class="chart" id="trendChart"></div>` : `<div class="empty">Der Trend braucht etwas mehr als ein Jahr Daten.${roll.length === 1 ? ` Bisher: ${fmtKwh(roll[0].kwh)} in den letzten 12 Monaten.` : ''}</div>`}</div>`);
+  html.push(`<h2 class="section-title">Entwicklung</h2><p class="section-sub">Verbrauchst du mehr oder weniger als früher?</p><div class="cols">${cards.join('')}</div>`);
+  html.push(`<h2 class="section-title">Verbrauchsmuster</h2><p class="section-sub">Wann verbrauchst du wie viel?</p>`);
+  const pc = [], se = seasons(M);
+  if (se && se.summer != null && se.winter != null) {
+    const pct = Math.round((se.winter / se.summer - 1) * 100);
+    pc.push(`<div class="card"><div class="card-head"><h2>Sommer und Winter</h2></div>
+      <div class="duo"><div><span class="k">Sommer (Apr–Sep)</span><span class="v">${fmtN(se.summer, 1)}</span><span class="k">kWh pro Tag</span></div><div><span class="k">Winter (Okt–Mär)</span><span class="v">${fmtN(se.winter, 1)}</span><span class="k">kWh pro Tag</span></div></div>
+      <p class="small muted">Im Winter verbrauchst du ${pct >= 0 ? pct + ' % mehr' : -pct + ' % weniger'} als im Sommer.${se.sn < 120 || se.wn < 120 ? ' Noch nicht ein ganzes Jahr gemessen, der Wert wird genauer.' : ''}</p></div>`);
+  } else pc.push(`<div class="card"><div class="card-head"><h2>Sommer und Winter</h2></div><div class="empty">Braucht Ablesungen aus Sommer- und Wintermonaten.</div></div>`);
+  const full = months.filter(m => m.complete);
+  if (full.length >= 2) {
+    const hi = full.reduce((a, b) => b.perDay > a.perDay ? b : a), lo = full.reduce((a, b) => b.perDay < a.perDay ? b : a);
+    const nm = k => MONL[+k.slice(5, 7) - 1] + ' ' + k.slice(0, 4);
+    pc.push(`<div class="card"><div class="card-head"><h2>Rekordmonate</h2></div><div class="list">
+      <div class="li"><div class="daydot" style="background:var(--bad-soft);color:var(--bad)">▲</div><div class="main"><b>${nm(hi.key)}</b><span>höchster Verbrauch</span></div><div class="end"><b>${fmtKwh(hi.kwh)}</b><span>${fmtN(hi.perDay, 1)} kWh/Tag</span></div></div>
+      <div class="li"><div class="daydot" style="background:var(--good-soft);color:var(--good)">▼</div><div class="main"><b>${nm(lo.key)}</b><span>niedrigster Verbrauch</span></div><div class="end"><b>${fmtKwh(lo.kwh)}</b><span>${fmtN(lo.perDay, 1)} kWh/Tag</span></div></div>
+      </div><p class="small muted">Pro Tag verglichen, damit kurze und lange Monate fair sind.</p></div>`);
+  } else pc.push(`<div class="card"><div class="card-head"><h2>Rekordmonate</h2></div><div class="empty">Sobald zwei Monate komplett gemessen sind, siehst du hier deine Spitzen.</div></div>`);
+  const yrs = app.calcs.filter(x => !x.noForecast);
+  pc.push(`<div class="card"><div class="card-head"><h2>Jahre im Vergleich</h2></div>${yrs.length ? `<div class="chart" id="yearsChart"></div><p class="small muted">Abrechnungsjahre. Schraffiert ist der geschätzte Teil.</p>` : '<div class="empty">Noch keine Daten.</div>'}</div>`);
+  pc.push(`<div class="card"><div class="card-head"><h2>Kalender</h2></div>${M.iv.length ? `<p class="small muted">Verbrauch pro Tag im letzten Jahr, zwischen zwei Ablesungen gemittelt. Je öfter du abliest, desto genauer das Bild.</p><div class="scroll-x" id="heatWrap"></div><div class="heat-legend">weniger <i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i><i style="background:var(--heat-5)"></i> mehr</div>` : '<div class="empty">Noch keine Daten.</div>'}</div>`);
+  html.push(`<div class="cols">${pc.join('')}</div>`);
+  html.push(`<h2 class="section-title">Einordnung</h2><p class="section-sub">Wie steht dein Verbrauch im Vergleich da?</p><div class="cols">${einordnung.join('')}</div>`);
+  document.querySelector('[data-panel="statistik"]').innerHTML = html.join('');
+  if (yoy.length) yoyChart($('yoyChart'), yoy);
+  if (roll.length >= 2) trendChart($('trendChart'), roll);
+  if (yrs.length) yearsChart($('yearsChart'), yrs);
+  if (M.iv.length) heatmap($('heatWrap'), M);
+}
+
+// ---------- Einstellungen ----------
+function renderSettings() {
+  const s = app.state, p = s.profil, ls = s.meta.letzteSicherung;
+  const canShare = !!(navigator.canShare && window.File && (() => { try { return navigator.canShare({ files: [new File(['x'], 'x.json', { type: 'application/json' })] }); } catch { return false; } })());
+  const theme = store.prefs().theme || 'system';
+  document.querySelector('[data-panel="einstellungen"]').innerHTML = `<div class="cols">
+  <div class="stack">
+    <div class="card"><div class="card-head"><h2>Haushalt</h2></div>
+      <div class="field"><label for="stName">Dein Name <span class="muted">(für die Begrüßung)</span></label><input id="stName" class="input" type="text" maxlength="40" value="${esc(p.name)}" data-set="name" autocomplete="given-name"></div>
+      <div class="field"><span class="lbl" id="lbPers">Personen im Haushalt</span><div class="seg" role="group" aria-labelledby="lbPers">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-pers="${n}" aria-pressed="${p.personen === n}">${n === 5 ? '5+' : n}</button>`).join('')}</div></div>
+      <div class="field"><span class="lbl" id="lbWohn">Wohnform</span><div class="seg" role="group" aria-labelledby="lbWohn"><button type="button" data-wohn="wohnung" aria-pressed="${p.wohnform !== 'haus'}">Wohnung</button><button type="button" data-wohn="haus" aria-pressed="${p.wohnform === 'haus'}">Haus</button></div></div>
+      <div class="field"><label for="stCo2">CO₂ pro kWh</label><div class="unit"><input id="stCo2" class="input" type="text" inputmode="decimal" value="${fmtN(p.co2)}" data-set="co2"><span>g/kWh</span></div><span class="help">Deutscher Strommix ca. 363. Bei Ökostrom steht der Wert auf deiner Stromrechnung.</span></div>
+    </div>
+    <div class="card" id="goalSettings"><div class="card-head"><h2>Sparziel</h2></div>
+      <div class="field"><label for="stZiel">Ziel pro Abrechnungsjahr</label><div class="unit"><input id="stZiel" class="input" type="text" inputmode="decimal" placeholder="kein Ziel" value="${s.ziel.kwh ? fmtN(s.ziel.kwh) : ''}" data-set="ziel"><span>kWh</span></div><span class="help">Leer lassen für kein Ziel.</span></div></div>
+    <div class="card"><div class="card-head"><h2>Ablese-Erinnerung</h2></div>
+      <div class="field"><span class="lbl" id="lbInt">Wie oft liest du ab?</span><div class="seg" role="group" aria-labelledby="lbInt">
+        <button type="button" data-int="monat" aria-pressed="${s.erinnerung.intervall === 'monat'}">Monatlich</button><button type="button" data-int="2wochen" aria-pressed="${s.erinnerung.intervall === '2wochen'}">Alle 2 Wochen</button><button type="button" data-int="woche" aria-pressed="${s.erinnerung.intervall === 'woche'}">Wöchentlich</button></div>
+        <span class="help">Nächste Ablesung: ${fmtD(nextDue(s, app.M))}.</span></div>
+      <button class="btn soft" type="button" data-act="ics" style="justify-self:start">${icon('bell', 18)}Erinnerung in den Kalender eintragen</button></div>
+  </div>
+  <div class="stack">
+    <div class="card"><div class="card-head"><h2>Daten &amp; Sicherung</h2></div>
+      <p class="small" style="color:var(--fg-2)">Deine Daten liegen nur auf diesem Gerät, in diesem Browser. Es gibt kein Konto und keinen Server. ${ls ? `Letzte Sicherung: <b>${fmtD(ls)}</b>.` : '<b>Noch keine Sicherung.</b>'}</p>
+      <div class="btns"><button class="btn primary" type="button" data-act="backup">${icon('save', 18)}Sicherung speichern</button>${canShare ? `<button class="btn soft" type="button" data-act="share">Sicherung teilen …</button>` : ''}</div>
+      <div class="btns"><button class="btn" type="button" data-act="import">Sicherung laden</button><button class="btn" type="button" data-act="csv">Als Tabelle (.csv)</button></div>
+      <p class="small muted">Leg die Datei z. B. in iCloud Drive oder Google Drive. Mit „Sicherung laden“ holst du alles auf ein neues Gerät.</p>
+      ${app.storageOk ? '' : '<p class="msg err">Dieser Browser erlaubt kein dauerhaftes Speichern (z. B. privates Fenster). Speichere unbedingt eine Sicherung.</p>'}</div>
+    <div class="card"><div class="card-head"><h2>Darstellung &amp; Hilfe</h2></div>
+      <div class="field"><span class="lbl" id="lbTheme">Erscheinungsbild</span><div class="seg" role="group" aria-labelledby="lbTheme">
+        <button type="button" data-theme-set="system" aria-pressed="${theme === 'system'}">Automatisch</button><button type="button" data-theme-set="light" aria-pressed="${theme === 'light'}">Hell</button><button type="button" data-theme-set="dark" aria-pressed="${theme === 'dark'}">Dunkel</button></div></div>
+      <div class="btns"><button class="btn soft" type="button" data-act="help">${icon('help', 18)}Anleitung ansehen</button></div></div>
+    ${app.demo ? '' : `<div class="card"><div class="card-head"><h2>Alles löschen</h2></div><p class="small muted">Löscht alle Ablesungen, Verträge und Einstellungen von diesem Gerät. Sicherungsdateien bleiben erhalten.</p>
+      <div id="resetZone"><button class="btn danger sm" type="button" data-act="reset">Alle Daten löschen</button></div></div>`}
+  </div></div>`;
+}
+
+// ================= Vertrags-Editor =================
+const ed = { draft: null, isNew: false };
+function openContract(id) {
+  if (app.demo && id === undefined) { toast('Leg zuerst dein eigenes Zählerbuch an.'); openGuide('setup', 1); return; }
+  const s = app.state;
+  if (id) { ed.draft = JSON.parse(JSON.stringify(s.vertraege.find(c => c.id === id))); ed.isNew = false; }
+  else {
+    const last = s.vertraege[s.vertraege.length - 1];
+    const beginn = last.ende ? ds(dn(last.ende) + 1) : addMonths(last.beginn, 12) > todayStr() ? addMonths(last.beginn, 12) : todayStr();
+    ed.draft = cleanContract({ beginn, zaehlernr: last.zaehlernr, frist: { wert: null, einheit: 'wochen' }, preise: [{ ...last.preise[last.preise.length - 1], ab: beginn }] });
+    ed.draft.anbieter = '';
+    ed.isNew = true;
+  }
+  ed.confirmDel = false;
+  renderContractEditor();
+  if (!$('contractDlg').open) $('contractDlg').showModal();
+}
+function renderContractEditor() {
+  const c = ed.draft, n = app.state.vertraege.length;
+  $('ctTitle').textContent = ed.isNew ? 'Neuer Vertrag' : 'Vertragsakte';
+  const priceRows = c.preise.map((p, i) => `<div class="price-row"><div class="price-row-head"><b>${i === 0 ? 'Preise ab Vertragsbeginn' : 'Preisänderung'}</b>${i > 0 ? `<button class="icon-btn danger" type="button" data-ce="del-price" data-i="${i}" aria-label="Preisänderung löschen">${icon('trash', 17)}</button>` : ''}</div>
+    ${i > 0 ? `<div class="field"><label for="ce-ab-${i}">Gültig ab</label><input id="ce-ab-${i}" class="input" type="date" value="${p.ab}"></div>` : ''}
+    <div class="grid3">
+      <div class="field"><label for="ce-ap-${i}">Arbeitspreis</label><div class="unit"><input id="ce-ap-${i}" class="input" type="text" inputmode="decimal" value="${fmtN(p.arbeitspreis, 2)}"><span>ct/kWh</span></div></div>
+      <div class="field"><label for="ce-gp-${i}">Grundpreis</label><div class="unit"><input id="ce-gp-${i}" class="input" type="text" inputmode="decimal" value="${fmtN(p.grundpreis, 2)}"><span>€/Monat</span></div></div>
+      <div class="field"><label for="ce-as-${i}">Abschlag</label><div class="unit"><input id="ce-as-${i}" class="input" type="text" inputmode="decimal" value="${fmtN(p.abschlag, 2)}"><span>€/Monat</span></div></div>
+    </div></div>`).join('');
+  $('ctBody').innerHTML = `
+    <div class="form-section"><h3>Anbieter &amp; Tarif</h3>
+      <div class="field"><label for="ce-anbieter">Anbieter</label><input id="ce-anbieter" class="input" type="text" maxlength="60" placeholder="z. B. Stadtwerke Musterstadt" value="${esc(c.anbieter)}"></div>
+      <div class="field"><label for="ce-tarif">Tarifname <span class="muted">(optional)</span></label><input id="ce-tarif" class="input" type="text" maxlength="60" value="${esc(c.tarif)}"></div>
+    </div>
+    <div class="form-section"><h3>Laufzeit &amp; Kündigung</h3>
+      <div class="grid2 wrap">
+        <div class="field"><label for="ce-beginn">Lieferbeginn</label><input id="ce-beginn" class="input" type="date" value="${c.beginn}"></div>
+        <div class="field"><label for="ce-ende">Erstlaufzeit bis</label><input id="ce-ende" class="input" type="date" value="${c.ende || ''}"><span class="help">Steht in der Vertragsbestätigung.</span></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label for="ce-fwert">Kündigungsfrist</label><input id="ce-fwert" class="input" type="text" inputmode="numeric" placeholder="z. B. 6" value="${c.frist.wert ?? ''}"></div>
+        <div class="field"><label for="ce-feinheit">&nbsp;</label><select id="ce-feinheit" class="input"><option value="wochen" ${c.frist.einheit === 'wochen' ? 'selected' : ''}>Wochen</option><option value="monate" ${c.frist.einheit === 'monate' ? 'selected' : ''}>Monate</option><option value="tage" ${c.frist.einheit === 'tage' ? 'selected' : ''}>Tage</option></select></div>
+      </div>
+      <div class="field"><label for="ce-garantie">Preisgarantie bis <span class="muted">(optional)</span></label><input id="ce-garantie" class="input" type="date" value="${c.preisgarantie || ''}"></div>
+    </div>
+    <div class="form-section"><h3>Preise</h3>${priceRows}
+      <button class="btn sm" type="button" data-ce="add-price" style="justify-self:start">${icon('plus', 16)}Preisänderung hinzufügen</button>
+      <span class="help">Erhöht der Anbieter die Preise, füge eine Änderung mit Datum hinzu. Bei einer Preiserhöhung hast du meist ein Sonderkündigungsrecht.</span></div>
+    <div class="form-section"><h3>Bonus</h3>
+      <div class="grid2 wrap">
+        <div class="field"><label for="ce-bsofort">Sofortbonus</label><div class="unit"><input id="ce-bsofort" class="input" type="text" inputmode="decimal" placeholder="0" value="${c.bonus.sofort.betrag ? fmtN(c.bonus.sofort.betrag, 2) : ''}"><span>€</span></div><span class="help">Wird kurz nach Lieferbeginn ausgezahlt.</span></div>
+        <div class="field"><label for="ce-bsofortd">Erhalten am <span class="muted">(optional)</span></label><input id="ce-bsofortd" class="input" type="date" value="${c.bonus.sofort.erhalten || ''}"></div>
+      </div>
+      <div class="grid2 wrap">
+        <div class="field"><label for="ce-bneu">Neukundenbonus</label><div class="unit"><input id="ce-bneu" class="input" type="text" inputmode="decimal" placeholder="0" value="${c.bonus.neukunde.betrag ? fmtN(c.bonus.neukunde.betrag, 2) : ''}"><span>€</span></div><span class="help">Wird mit der ersten Jahresrechnung verrechnet.</span></div>
+        <div class="field"><label for="ce-bneud">Verrechnet am <span class="muted">(optional)</span></label><input id="ce-bneud" class="input" type="date" value="${c.bonus.neukunde.erhalten || ''}"></div>
+      </div>
+      <span class="help">Beide Boni zählen im ersten Vertragsjahr. Der Neukundenbonus senkt die Nachzahlung, der Sofortbonus nur deine Gesamtkosten.</span>
+    </div>
+    <div class="form-section"><h3>Nummern &amp; Kontakt</h3>
+      <div class="grid2 wrap">
+        <div class="field"><label for="ce-kundennr">Kundennummer</label><input id="ce-kundennr" class="input" type="text" maxlength="40" value="${esc(c.kundennr)}"></div>
+        <div class="field"><label for="ce-vertragsnr">Vertragsnummer</label><input id="ce-vertragsnr" class="input" type="text" maxlength="40" value="${esc(c.vertragsnr)}"></div>
+      </div>
+      <div class="field"><label for="ce-zaehlernr">Zählernummer</label><input id="ce-zaehlernr" class="input" type="text" maxlength="40" value="${esc(c.zaehlernr)}"><span class="help">Steht auf dem Zähler, oft mit „1ESY“ oder ähnlich am Anfang.</span></div>
+      <div class="field"><label for="ce-web">Kundenportal / Website</label><input id="ce-web" class="input" type="url" inputmode="url" maxlength="200" placeholder="https://" value="${esc(c.kontakt.web)}"></div>
+      <div class="grid2 wrap">
+        <div class="field"><label for="ce-tel">Telefon</label><input id="ce-tel" class="input" type="tel" maxlength="40" value="${esc(c.kontakt.tel)}"></div>
+        <div class="field"><label for="ce-mail">E-Mail</label><input id="ce-mail" class="input" type="email" maxlength="120" value="${esc(c.kontakt.mail)}"></div>
+      </div>
+    </div>
+    <div class="form-section"><h3>Notizen</h3>
+      <div class="field"><label for="ce-notiz" class="sr">Notizen</label><textarea id="ce-notiz" class="input" maxlength="1000" placeholder="z. B. Kündigung per E-Mail an …, Bonusbedingungen">${esc(c.notiz)}</textarea></div>
+    </div>
+    ${!ed.isNew && n > 1 ? `<div id="ceDelZone">${ed.confirmDel ? `<div class="confirm"><span>Diesen Vertrag löschen? Ablesungen bleiben erhalten.</span><span class="btns"><button class="btn danger sm" type="button" data-ce="del-yes">Löschen</button><button class="btn sm" type="button" data-ce="del-no">Behalten</button></span></div>` : `<button class="btn danger sm" type="button" data-ce="del">Vertrag löschen</button>`}</div>` : ''}
+    <p id="ceMsg" class="msg" hidden></p>`;
+  $('ctFoot').innerHTML = `<button class="btn primary block" type="button" data-ce="save">${ed.isNew ? 'Vertrag anlegen' : 'Speichern'}</button>`;
+}
+function readContractEditor() {
+  const c = ed.draft, v = id => ($(id) ? $(id).value : '');
+  c.anbieter = v('ce-anbieter').trim(); c.tarif = v('ce-tarif').trim();
+  c.beginn = v('ce-beginn'); c.ende = v('ce-ende') || null; c.preisgarantie = v('ce-garantie') || null;
+  const fw = v('ce-fwert').trim(); c.frist = { wert: fw === '' ? null : parseInt(fw, 10), einheit: v('ce-feinheit') };
+  const bn = id => v(id).trim() ? parseNum(v(id)) : 0;
+  c.bonus = { sofort: { betrag: bn('ce-bsofort'), erhalten: v('ce-bsofortd') || null }, neukunde: { betrag: bn('ce-bneu'), erhalten: v('ce-bneud') || null } };
+  c.kundennr = v('ce-kundennr').trim(); c.vertragsnr = v('ce-vertragsnr').trim(); c.zaehlernr = v('ce-zaehlernr').trim();
+  c.kontakt = { web: v('ce-web').trim(), tel: v('ce-tel').trim(), mail: v('ce-mail').trim() };
+  c.notiz = v('ce-notiz');
+  c.preise = c.preise.map((p, i) => ({ ab: i === 0 ? c.beginn : v('ce-ab-' + i), arbeitspreis: parseNum(v('ce-ap-' + i)), grundpreis: parseNum(v('ce-gp-' + i)), abschlag: parseNum(v('ce-as-' + i)) }));
+}
+function validateContract() {
+  const c = ed.draft, others = app.state.vertraege.filter(x => x.id !== c.id);
+  if (!isDate(c.beginn)) return 'Bitte den Lieferbeginn eintragen.';
+  if (others.some(x => x.beginn === c.beginn)) return 'An diesem Tag beginnt schon ein anderer Vertrag.';
+  if (c.ende && c.ende <= c.beginn) return 'Das Laufzeitende muss nach dem Lieferbeginn liegen.';
+  if (c.frist.wert != null && (!Number.isInteger(c.frist.wert) || c.frist.wert < 0 || c.frist.wert > 52)) return 'Bitte die Kündigungsfrist als ganze Zahl eintragen, z. B. 6.';
+  if (!(c.bonus.sofort.betrag >= 0) || !(c.bonus.neukunde.betrag >= 0)) return 'Bitte den Bonus als Zahl eintragen, z. B. 100.';
+  for (const [i, p] of c.preise.entries()) {
+    if (i > 0 && (!isDate(p.ab) || p.ab <= c.beginn)) return 'Eine Preisänderung braucht ein Datum nach dem Lieferbeginn.';
+    if (!(p.arbeitspreis >= 1 && p.arbeitspreis <= 200)) return 'Bitte den Arbeitspreis in Cent pro kWh eintragen, z. B. 33,13.';
+    if (!(p.grundpreis >= 0) || !(p.abschlag >= 0)) return 'Bitte Grundpreis und Abschlag als Zahlen eintragen.';
+  }
+  if (new Set(c.preise.map(p => p.ab)).size !== c.preise.length) return 'Zwei Preiszeilen haben dasselbe Datum.';
+  return null;
+}
+$('contractDlg').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-ce]'); if (!b) return;
+  readContractEditor();
+  const a = b.dataset.ce, c = ed.draft;
+  if (a === 'add-price') { const lp = c.preise[c.preise.length - 1]; let ab = todayStr() > c.beginn ? todayStr().slice(0, 8) + '01' : addMonths(c.beginn, 1); if (ab <= c.beginn) ab = addMonths(c.beginn, 1); while (c.preise.some(p => p.ab === ab)) ab = addMonths(ab, 1); c.preise.push({ ...lp, ab }); renderContractEditor(); $('ctBody').scrollTop = $('ctBody').scrollHeight / 2; }
+  else if (a === 'del-price') { c.preise.splice(+b.dataset.i, 1); renderContractEditor(); }
+  else if (a === 'del') { ed.confirmDel = true; renderContractEditor(); $('ceDelZone').scrollIntoView({ block: 'center' }); }
+  else if (a === 'del-no') { ed.confirmDel = false; renderContractEditor(); }
+  else if (a === 'del-yes') { $('contractDlg').close(); commit({ ...app.state, vertraege: app.state.vertraege.filter(x => x.id !== c.id) }, 'Vertrag gelöscht'); }
+  else if (a === 'save') {
+    if (app.demo) { toast('In den Beispieldaten nicht änderbar.'); return; }
+    const err = validateContract();
+    if (err) { showMsg($('ceMsg'), err, 'err'); $('ceMsg').scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    c.preise.sort((x, y) => x.ab < y.ab ? -1 : 1);
+    const clean = cleanContract(c);
+    const list = app.state.vertraege.filter(x => x.id !== c.id).concat(clean).sort((x, y) => x.beginn < y.beginn ? -1 : 1);
+    $('contractDlg').close(); app.period = null;
+    commit({ ...app.state, vertraege: list }, ed.isNew ? 'Vertrag angelegt' : 'Vertrag gespeichert');
+  }
+});
+
+// ================= Diagramme =================
+function niceMax(v) { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p; return [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find(x => n <= x + 1e-9) * p; }
+const cw = el => Math.max(260, Math.round(el.clientWidth || 600));
+function attachTip(el, svg, W, fn) {
+  const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; el.appendChild(tip);
+  const move = ev => {
+    const box = svg.getBoundingClientRect(), scale = W / box.width;
+    const res = fn((ev.clientX - box.left) * scale, ev.target);
+    if (!res) { tip.hidden = true; return; }
+    tip.innerHTML = res.html; tip.hidden = false;
+    const x = res.x / scale, y = res.y / scale, w = el.clientWidth;
+    let left = x + 12; if (left + tip.offsetWidth > w) left = x - tip.offsetWidth - 12; if (left < 0) left = 0;
+    tip.style.left = left + 'px'; tip.style.top = Math.max(-8, y - tip.offsetHeight - 10) + 'px';
+  };
+  svg.addEventListener('pointermove', move);
+  svg.addEventListener('pointerdown', move);
+  svg.addEventListener('pointerleave', () => { tip.hidden = true; fn(null); });
+}
+function yAxis(m, W, y, max, unit) {
+  let g = '';
+  for (let i = 0; i <= 4; i++) { const v = max / 4 * i, yy = y(v); g += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" ${i ? 'stroke-dasharray="2 4"' : ''}/><text x="${m.l - 8}" y="${yy + 4}" text-anchor="end">${fmtN(v)}</text>`; }
+  return g + `<text x="${m.l - 8}" y="${m.t - 6}" text-anchor="end">${unit}</text>`;
+}
+let hatchN = 0;
+// Jedes Diagramm bekommt ein eigenes Muster, damit doppelte IDs nicht kollidieren
+function hatchDef() { const id = 'hatch' + (++hatchN); return { id, def: `<defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="var(--accent-soft)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--accent)" stroke-opacity=".55" stroke-width="2.4"/></pattern></defs>` }; }
+function barPath(x, y0, y1, w, r) { const h = y0 - y1; if (h <= 0.5) return ''; const rr = Math.min(r, h, w / 2); return `M${x},${y0} V${y1 + rr} Q${x},${y1} ${x + rr},${y1} H${x + w - rr} Q${x + w},${y1} ${x + w},${y1 + rr} V${y0} Z`; }
+
+function monthChart(el, c, prev) {
+  if (c.noForecast && c.kwhKnown === 0) { el.innerHTML = `<div class="empty">${icon('chart', 28)}<span>Ab der zweiten Ablesung siehst du hier deinen Verbrauch pro Monat.</span></div>`; return; }
+  const W = cw(el), H = 220, m = { l: 40, r: 4, t: 16, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const pm = new Map(); if (prev) prev.months.forEach(x => { if (x.knownDays === x.days) pm.set(x.key, x.known); });
+  const rows = c.months.map(x => ({ ...x, prev: pm.get(String(+x.key.slice(0, 4) - 1) + x.key.slice(4)) ?? null }));
+  const max = niceMax(Math.max(...rows.map(r => Math.max(r.known + r.est, r.prev || 0))) * 1.05);
+  const y = v => m.t + ih - v / max * ih, band = iw / rows.length, bw = Math.min(28, band * 0.62);
+  const H1 = hatchDef();
+  let g = H1.def + yAxis(m, W, y, max, 'kWh');
+  rows.forEach((r, i) => {
+    const cx = m.l + band * i + band / 2, x = cx - bw / 2, y0 = y(0), yk = y(r.known), yt = y(r.known + r.est);
+    if (r.est > 0 && r.known > 0) g += `<rect x="${x}" y="${yk}" width="${bw}" height="${y0 - yk}" fill="var(--accent)"/><path d="${barPath(x, yk - 2, yt, bw, 5)}" fill="url(#${H1.id})"/>`;
+    else if (r.est > 0) g += `<path d="${barPath(x, y0, yt, bw, 5)}" fill="url(#${H1.id})"/>`;
+    else g += `<path d="${barPath(x, y0, yk, bw, 5)}" fill="var(--accent)"/>`;
+    if (r.prev != null) { const yp = y(r.prev); g += `<line x1="${cx - band * 0.42}" x2="${cx + band * 0.42}" y1="${yp}" y2="${yp}" stroke="var(--fg-2)" stroke-width="2" stroke-linecap="round"/>`; }
+    if (band > 26 || i % 2 === 0) g += `<text x="${cx}" y="${H - 6}" text-anchor="middle">${monLabel(r.key)}</text>`;
+    g += `<rect class="hit" data-i="${i}" x="${m.l + band * i}" y="${m.t}" width="${band}" height="${ih}" fill="transparent"/>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verbrauch pro Monat">${g}</svg>`;
+  attachTip(el, el.querySelector('svg'), W, (px, t) => {
+    if (px == null || !t || !t.classList || !t.classList.contains('hit')) return null;
+    const i = +t.dataset.i, r = rows[i], tot = r.known + r.est;
+    return { x: m.l + band * i + band / 2, y: y(Math.max(tot, r.prev || 0)), html: `<b>${MONL[+r.key.slice(5, 7) - 1]} ${r.key.slice(0, 4)}</b><br>${fmtKwh(tot)} ${r.est > 0 ? (r.known > 0 ? `(davon ${fmtKwh(r.known)} gemessen)` : '(geschätzt)') : 'gemessen'}<br>${fmtN(tot / r.days, 1)} kWh pro Tag${r.prev != null ? `<br>Vorjahr: ${fmtKwh(r.prev)}` : ''}` };
+  });
+}
+function cumChart(el, c, M) {
+  if (c.noForecast) { el.innerHTML = `<div class="empty">${icon('receipt', 28)}<span>Ab der zweiten Ablesung siehst du hier, ob deine Abschläge reichen.</span></div>`; return; }
+  const W = cw(el), H = 220, m = { l: 44, r: 6, t: 16, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b, n = c.totalDays;
+  const max = niceMax(Math.max(c.cost, c.abschlaege) * 1.04);
+  const x = d => m.l + (d - c.s) / n * iw, y = v => m.t + ih - v / max * ih;
+  let g = yAxis(m, W, y, max, '€');
+  c.months.forEach((mo, i) => { if (i % (iw < 420 ? 3 : 2) === 0) { const d0 = Math.max(c.s, dn(mo.key + '-01')); g += `<text x="${x(d0) + 2}" y="${H - 6}">${monLabel(mo.key)}</text>`; } });
+  let pa = `M${x(c.s)},${y(0)}`;
+  c.abschlagSteps.forEach((st, i) => { pa += ` V${y(st.sum).toFixed(1)} H${x(i < c.abschlagSteps.length - 1 ? c.abschlagSteps[i + 1].d : c.e).toFixed(1)}`; });
+  const runs = []; let run = null;
+  c.cum.forEach((p, i) => { if (!run || run.known !== p.known) { run = { known: p.known, pts: [i ? { d: c.cum[i - 1].d, cost: c.cum[i - 1].cost } : { d: c.s - 1, cost: 0 }] }; runs.push(run); } run.pts.push(p); });
+  const path = r => r.pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.d + 1).toFixed(1)},${y(p.cost).toFixed(1)}`).join('');
+  g += `<path d="${pa}" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-linejoin="round"/>`;
+  runs.forEach(r => g += `<path d="${path(r)}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" ${r.known ? '' : 'stroke-dasharray="5 5"'}/>`);
+  if (M.last > c.s && M.last < c.e) { const lx = x(M.last); g += `<line x1="${lx}" x2="${lx}" y1="${m.t}" y2="${y(0)}" stroke="var(--muted)" stroke-dasharray="2 3"/><text x="${lx + (lx < W - 120 ? 4 : -4)}" y="${m.t + 10}" text-anchor="${lx < W - 120 ? 'start' : 'end'}">letzte Ablesung</text>`; }
+  let yc = y(c.cost), ya = y(c.abschlaege);
+  if (Math.abs(yc - ya) < 16) { if (yc < ya) { yc -= 8; ya += 8; } else { yc += 8; ya -= 8; } }
+  g += `<text class="val halo" x="${W - m.r}" y="${yc - 7}" text-anchor="end">${fmtEur(c.cost, 0)}</text><text class="halo" x="${W - m.r}" y="${ya + (ya > yc ? 16 : -7)}" text-anchor="end">${fmtEur(c.abschlaege, 0)}</text>`;
+  g += `<line class="cross" y1="${m.t}" y2="${y(0)}" stroke="var(--fg-2)" visibility="hidden"/><circle class="dc" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/><circle class="da" r="5" fill="var(--series-2)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/><rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Aufsummierte Stromkosten gegen gezahlte Abschläge">${g}</svg>`;
+  const svg = el.querySelector('svg'), cross = svg.querySelector('.cross'), dc = svg.querySelector('.dc'), da = svg.querySelector('.da');
+  const abAt = d => { let s = 0; for (const st of c.abschlagSteps) if (st.d <= d) s = st.sum; return s; };
+  attachTip(el, svg, W, px => {
+    if (px == null) { [cross, dc, da].forEach(e => e.setAttribute('visibility', 'hidden')); return null; }
+    const d = Math.max(c.s, Math.min(c.e - 1, Math.round(c.s + (px - m.l) / iw * n - 1)));
+    const p = c.cum[d - c.s], ab = abAt(d), X = x(d + 1);
+    cross.setAttribute('x1', X); cross.setAttribute('x2', X); dc.setAttribute('cx', X); dc.setAttribute('cy', y(p.cost)); da.setAttribute('cx', X); da.setAttribute('cy', y(ab));
+    [cross, dc, da].forEach(e => e.setAttribute('visibility', 'visible'));
+    const diff = ab - p.cost;
+    return { x: X, y: y(Math.max(p.cost, ab)), html: `<b>${fmtD(ds(d))}</b>${p.known ? '' : ' · Schätzung'}<br>Kosten: ${fmtEur(p.cost, 0)}<br>Abschläge: ${fmtEur(ab, 0)}<br>${diff >= 0 ? 'Polster' : 'Lücke'}: ${fmtEur(Math.abs(diff), 0)}` };
+  });
+}
+function yoyChart(el, rows) {
+  const W = cw(el), H = 200, m = { l: 8, r: 8, t: 22, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const ext = Math.max(10, ...rows.map(r => Math.abs(r.pct))) * 1.15;
+  const y = v => m.t + ih / 2 - v / ext * ih / 2, band = iw / rows.length, bw = Math.min(26, band * 0.6);
+  let g = `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}"/>`;
+  rows.forEach((r, i) => {
+    const cx = m.l + band * i + band / 2, x = cx - bw / 2, up = r.pct > 0, y0 = y(0), y1 = y(r.pct), h = Math.abs(y1 - y0);
+    if (h > 0.5) g += `<rect x="${x}" y="${Math.min(y0, y1)}" width="${bw}" height="${h}" rx="4" fill="var(--${up ? 'series-2' : 'accent'})"/>`;
+    if (band > 34) g += `<text class="val" x="${cx}" y="${up ? y1 - 5 : y1 + 13}" text-anchor="middle">${up ? '+' : '−'}${fmtN(Math.abs(r.pct))}%</text>`;
+    if (band > 26 || i % 2 === 0) g += `<text x="${cx}" y="${H - 6}" text-anchor="middle">${monLabel(r.key)}</text>`;
+    g += `<rect class="hit" data-i="${i}" x="${m.l + band * i}" y="${m.t}" width="${band}" height="${ih}" fill="transparent"/>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Veränderung gegenüber dem Vorjahr">${g}</svg>`;
+  attachTip(el, el.querySelector('svg'), W, (px, t) => {
+    if (px == null || !t || !t.classList || !t.classList.contains('hit')) return null;
+    const i = +t.dataset.i, r = rows[i];
+    return { x: m.l + band * i + band / 2, y: m.t + 10, html: `<b>${MONL[+r.key.slice(5, 7) - 1]} ${r.key.slice(0, 4)}</b><br>${fmtKwh(r.now)} statt ${fmtKwh(r.prev)}<br>${r.pct >= 0 ? '+' : '−'}${fmtN(Math.abs(r.pct))} %` };
+  });
+}
+function trendChart(el, pts) {
+  const W = cw(el), H = 190, m = { l: 48, r: 10, t: 18, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const lo = Math.min(...pts.map(p => p.kwh)), hi = Math.max(...pts.map(p => p.kwh));
+  const pad = Math.max(50, (hi - lo) * 0.3), min = Math.max(0, Math.floor((lo - pad) / 100) * 100), max = Math.ceil((hi + pad) / 100) * 100;
+  const x = i => m.l + (pts.length === 1 ? iw / 2 : i / (pts.length - 1) * iw), y = v => m.t + ih - (v - min) / (max - min) * ih;
+  let g = '';
+  for (let i = 0; i <= 3; i++) { const v = min + (max - min) / 3 * i; g += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke-dasharray="2 4"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmtN(v)}</text>`; }
+  g += `<text x="${m.l - 8}" y="${m.t - 6}" text-anchor="end">kWh</text>`;
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.kwh).toFixed(1)}`).join('');
+  g += `<path d="${line} L${x(pts.length - 1)},${y(min)} L${x(0)},${y(min)} Z" fill="var(--accent)" fill-opacity=".1"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const step = Math.ceil(pts.length / (iw / 60));
+  pts.forEach((p, i) => { if (i % step === 0) g += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${monLabel(p.key)} ${p.key.slice(2, 4)}</text>`; });
+  const L = pts[pts.length - 1];
+  g += `<circle cx="${x(pts.length - 1)}" cy="${y(L.kwh)}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/><text class="val halo" x="${x(pts.length - 1) - 8}" y="${y(L.kwh) - 10}" text-anchor="end">${fmtKwh(L.kwh)}</text><circle class="dc" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Jahresverbrauch im Verlauf">${g}</svg>`;
+  const svg = el.querySelector('svg'), dc = svg.querySelector('.dc');
+  attachTip(el, svg, W, px => {
+    if (px == null) { dc.setAttribute('visibility', 'hidden'); return null; }
+    const i = Math.max(0, Math.min(pts.length - 1, Math.round((px - m.l) / iw * (pts.length - 1)))), p = pts[i];
+    dc.setAttribute('cx', x(i)); dc.setAttribute('cy', y(p.kwh)); dc.setAttribute('visibility', 'visible');
+    return { x: x(i), y: y(p.kwh), html: `<b>12 Monate bis ${fmtD(ds(p.d))}</b><br>${fmtKwh(p.kwh)}` };
+  });
+}
+function yearsChart(el, yrs) {
+  const W = cw(el), rowH = 40, m = { l: 52, r: 78, t: 4, b: 4 }, H = m.t + m.b + yrs.length * rowH, iw = W - m.l - m.r;
+  const max = Math.max(...yrs.map(c => c.kwh)) * 1.02, H1 = hatchDef();
+  let g = H1.def;
+  yrs.forEach((c, i) => {
+    const y0 = m.t + i * rowH + 8, h = rowH - 16, wk = c.kwhKnown / max * iw, wt = c.kwh / max * iw;
+    g += `<text x="${m.l - 10}" y="${y0 + h / 2 + 4}" text-anchor="end" style="fill:var(--fg-2);font-weight:650">${periodLabel(c)}</text>`;
+    if (wk > 0) g += `<rect x="${m.l}" y="${y0}" width="${wk}" height="${h}" rx="6" fill="var(--accent)"/>`;
+    if (wt - wk > 1) g += `<rect x="${m.l + wk + (wk > 0 ? 2 : 0)}" y="${y0}" width="${Math.max(0, wt - wk - (wk > 0 ? 2 : 0))}" height="${h}" rx="6" fill="url(#${H1.id})"/>`;
+    g += `<text class="val" x="${m.l + wt + 8}" y="${y0 + h / 2 + 4}">${fmtN(c.kwh)} kWh</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verbrauch je Abrechnungsjahr">${g}</svg>`;
+}
+function heatmap(wrap, M) {
+  const end = Math.min(dn(todayStr()), M.last), start0 = end - 364;
+  const wd = d => (new Date(d * DAY).getUTCDay() + 6) % 7;
+  const start = start0 - wd(start0), vals = [];
+  for (let d = start; d <= end; d++) vals.push({ d, r: d >= M.first && d < M.last ? M.rateAt(d) : null });
+  const known = vals.filter(v => v.r != null).map(v => v.r).sort((a, b) => a - b);
+  const q = f => known[Math.min(known.length - 1, Math.floor(f * known.length))];
+  const th = known.length ? [q(0.2), q(0.4), q(0.6), q(0.8)] : [];
+  const lvl = r => 1 + th.filter(t => r > t).length;
+  const cells = vals.map(v => `<i ${v.r != null ? `style="background:var(--heat-${lvl(v.r)})"` : ''} title="${fmtD(ds(v.d))}${v.r != null ? ': ' + fmtN(v.r, 1) + ' kWh' : ': keine Daten'}"></i>`).join('');
+  let ml = '';
+  for (let w = 0; w < Math.ceil(vals.length / 7); w++) { const s = ds(start + w * 7); ml += `<span style="width:12px;overflow:visible;white-space:nowrap">${+s.slice(8, 10) <= 7 ? monLabel(s) : ''}</span>`; }
+  wrap.innerHTML = `<div class="heat-months">${ml}</div><div class="heat" role="img" aria-label="Tagesverbrauch im letzten Jahr">${cells}</div>`;
+  wrap.scrollLeft = wrap.scrollWidth;
+}
+
+// ================= Ablesen =================
+function openEntry(editDatum) {
+  if (app.demo) { toast('Leg zuerst dein eigenes Zählerbuch an.'); openGuide('setup', 1); return; }
+  const M = app.M, last = M.R[M.R.length - 1];
+  $('editDatum').value = editDatum || '';
+  const r = editDatum ? app.state.readings.find(x => x.datum === editDatum) : null;
+  $('enDatum').value = r ? r.datum : todayStr(); $('enDatum').max = todayStr();
+  $('enStand').value = r ? String(r.stand).replace('.', ',') : '';
+  $('entryTitle').textContent = r ? 'Ablesung ändern' : 'Zähler ablesen';
+  $('enSubmit').textContent = r ? 'Änderung speichern' : 'Speichern';
+  $('enLast').textContent = last ? `Zuletzt ${standFmt(last.stand)} kWh am ${fmtD(last.datum)}. Nur die schwarzen Ziffern.` : 'Nur die schwarzen Ziffern, ohne rote Nachkommastelle.';
+  app.pendingWarn = null; showMsg($('enMsg'), ''); updatePreview();
+  $('entrySheet').showModal();
+  setTimeout(() => $('enStand').focus(), 60);
+}
+function checkEntry() {
+  const M = app.M, datum = $('enDatum').value, raw = $('enStand').value, stand = parseNum(raw), skip = $('editDatum').value;
+  if (!isDate(datum)) return { err: 'Bitte ein Datum wählen.', field: 'enDatum' };
+  if (datum > todayStr()) return { err: 'Das Datum liegt in der Zukunft.', field: 'enDatum' };
+  if (!raw.trim()) return { empty: true };
+  if (!isFinite(stand) || stand < 0) return { err: 'Bitte nur die Zahl eintragen, zum Beispiel 22812.', field: 'enStand' };
+  if (M.R.some(r => r.datum === datum && r.datum !== skip)) return { err: `Für den ${fmtD(datum)} gibt es schon eine Ablesung. Ändere sie unter „Verlauf“.`, field: 'enDatum' };
+  const d = dn(datum);
+  let before = null, after = null;
+  for (const r of M.R) { if (r.datum === skip) continue; if (r.d < d) before = r; else if (r.d > d && !after) after = r; }
+  if (before && stand < before.stand) return { err: `Der Stand ist kleiner als am ${fmtD(before.datum)} (${standFmt(before.stand)}). Bitte noch einmal ablesen.`, field: 'enStand' };
+  if (after && stand > after.stand) return { err: `Der Stand ist größer als die spätere Ablesung am ${fmtD(after.datum)} (${standFmt(after.stand)}).`, field: 'enStand' };
+  let info = '', warn = '';
+  if (before) {
+    const days = d - before.d, kwh = stand - before.stand, rate = kwh / days;
+    info = `+${fmtN(kwh, kwh % 1 ? 1 : 0)} kWh in ${days} ${days === 1 ? 'Tag' : 'Tagen'} · ${fmtN(rate, 1)} kWh pro Tag`;
+    if (M.avgRate && days >= 3 && (rate > M.avgRate * 2.5 || rate < M.avgRate * 0.3)) warn = `Das ist ${rate > M.avgRate ? 'viel mehr' : 'viel weniger'} als sonst (${fmtN(M.avgRate, 1)} kWh pro Tag). Stimmt die Zahl?`;
+  }
+  return { datum, stand, info, warn };
+}
+function updatePreview() { const r = checkEntry(); $('enPreview').textContent = r.info || ''; ['enDatum', 'enStand'].forEach(id => $(id).removeAttribute('aria-invalid')); }
+$('enDatum').addEventListener('input', () => { app.pendingWarn = null; showMsg($('enMsg'), ''); updatePreview(); });
+$('enStand').addEventListener('input', () => { app.pendingWarn = null; showMsg($('enMsg'), ''); $('enSubmit').textContent = $('editDatum').value ? 'Änderung speichern' : 'Speichern'; updatePreview(); });
+$('entryForm').addEventListener('submit', ev => {
+  ev.preventDefault();
+  const r = checkEntry(), msg = $('enMsg');
+  if (r.empty) { showMsg(msg, 'Bitte den Zählerstand eintragen.', 'err'); $('enStand').setAttribute('aria-invalid', 'true'); $('enStand').focus(); return; }
+  if (r.err) { showMsg(msg, r.err, 'err'); $(r.field).setAttribute('aria-invalid', 'true'); $(r.field).focus(); return; }
+  const key = r.datum + '|' + r.stand;
+  if (r.warn && app.pendingWarn !== key) { app.pendingWarn = key; showMsg(msg, r.warn, 'warn'); $('enSubmit').textContent = 'Ja, so speichern'; return; }
+  const s = app.state, skip = $('editDatum').value;
+  const readings = s.readings.filter(x => x.datum !== skip).concat({ datum: r.datum, stand: r.stand }).sort((a, b) => a.datum < b.datum ? -1 : 1);
+  $('entrySheet').close();
+  commit({ ...s, readings }, skip ? 'Ablesung geändert' : `Gespeichert: ${standFmt(r.stand)} kWh`);
+});
+
+// ================= Sicherung & Dateien =================
+function backupJson() { return JSON.stringify({ ...app.state, meta: { ...app.state.meta, letzteSicherung: todayStr() }, app: 'Zählerbuch Strom' }, null, 2); }
+function downloadFile(name, text, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function markBackup() { commit({ ...app.state, meta: { ...app.state.meta, letzteSicherung: todayStr() } }); }
+function doBackup() { if (app.demo) { toast('Beispieldaten werden nicht gesichert.'); return; } downloadFile(`zaehlerbuch-sicherung-${todayStr()}.json`, backupJson(), 'application/json'); markBackup(); toast('Sicherung gespeichert'); }
+async function doShare() {
+  const file = new File([backupJson()], `zaehlerbuch-sicherung-${todayStr()}.json`, { type: 'application/json' });
+  try { await navigator.share({ files: [file], title: 'Zählerbuch-Sicherung' }); markBackup(); toast('Sicherung geteilt'); }
+  catch (e) { if (e && e.name !== 'AbortError') doBackup(); }
+}
+function parseCsv(text) {
+  const out = [];
+  for (const line of text.split(/\r?\n/)) {
+    const parts = line.split(/[;\t,](?=\s*[\d"])/).map(p => p.trim().replace(/^"|"$/g, ''));
+    if (parts.length < 2) continue;
+    let d = parts[0], mm;
+    if ((mm = d.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/))) d = `${mm[3].length === 2 ? '20' + mm[3] : mm[3]}-${mm[2].padStart(2, '0')}-${mm[1].padStart(2, '0')}`;
+    const v = parseNum(parts[1]);
+    if (isDate(d) && isFinite(v) && v >= 0) out.push({ datum: d, stand: v });
+  }
+  return out;
+}
+async function importFile(file) {
+  const text = await file.text();
+  try {
+    if (/^\s*\{/.test(text)) {
+      const s = sanitize(JSON.parse(text));
+      app.demo = false; app.period = null;
+      if ($('guide').open) $('guide').close();
+      commit(s, `Sicherung geladen: ${s.readings.length} Ablesungen`);
+      store.setPref('onboarded', true);
+    } else {
+      const rows = parseCsv(text);
+      if (!rows.length) throw new Error('In der Datei wurden keine Zeilen mit Datum und Zählerstand gefunden.');
+      if (app.demo) { toast('Leg zuerst dein Zählerbuch an, dann kannst du die Tabelle laden.'); return; }
+      const map = new Map(app.state.readings.map(r => [r.datum, r]));
+      rows.forEach(r => map.set(r.datum, r));
+      commit(sanitize({ ...app.state, readings: [...map.values()] }), `${rows.length} Ablesungen übernommen`);
+    }
+  } catch (e) { toast(e instanceof SyntaxError ? 'Die Datei ist keine Zählerbuch-Sicherung.' : e.message); }
+}
+const icsStamp = () => new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+const icsWrap = ev => ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Zaehlerbuch Strom//DE', 'CALSCALE:GREGORIAN', ...ev, 'END:VCALENDAR'].join('\r\n') + '\r\n';
+function icsReading() {
+  const due = nextDue(app.state, app.M).replace(/-/g, ''), iv = app.state.erinnerung.intervall;
+  const rule = iv === 'woche' ? 'FREQ=WEEKLY' : iv === '2wochen' ? 'FREQ=WEEKLY;INTERVAL=2' : 'FREQ=MONTHLY;BYMONTHDAY=' + +due.slice(6, 8);
+  return icsWrap(['BEGIN:VEVENT', `UID:zaehlerbuch-ablesen-${Date.now()}@zaehlerbuch`, `DTSTAMP:${icsStamp()}`, `DTSTART:${due}T090000`, 'DURATION:PT10M', `RRULE:${rule}`,
+    'SUMMARY:Stromzähler ablesen', 'DESCRIPTION:Zählerstand ablesen und im Zählerbuch eintragen.', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Stromzähler ablesen', 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT']);
+}
+function icsKuendigung(c) {
+  const dl = kuendigenBis(c), d = dl.replace(/-/g, ''), d2 = ds(dn(dl) + 1).replace(/-/g, '');
+  const name = contractName(c).replace(/[,;\\]/g, ' ');
+  return icsWrap(['BEGIN:VEVENT', `UID:zaehlerbuch-kuendigung-${c.id}@zaehlerbuch`, `DTSTAMP:${icsStamp()}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${d2}`,
+    `SUMMARY:Letzter Tag: Stromvertrag ${name} kündigen`, `DESCRIPTION:Die Kündigung muss heute beim Anbieter sein. Vertragsende ${fmtD(c.ende)}.`,
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Stromvertrag bald kündigen', 'TRIGGER:-P21D', 'END:VALARM',
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Stromvertrag kündigen', 'TRIGGER:-P7D', 'END:VALARM', 'END:VEVENT']);
+}
+
+// ================= Einführung & Anleitung =================
+const guide = { mode: 'setup', step: 0, draft: {} };
+const METER_ART = `<svg width="230" height="124" viewBox="0 0 230 124" aria-hidden="true"><rect x="12" y="8" width="206" height="108" rx="18" fill="var(--surface)"/><circle cx="196" cy="26" r="5" fill="var(--accent)" opacity=".5"/><rect x="30" y="34" width="170" height="40" rx="8" fill="#1c2321"/>${[0, 1, 2, 3, 4, 5].map(i => `<rect x="${36 + i * 25}" y="40" width="20" height="28" rx="3" fill="#333c39"/><text x="${46 + i * 25}" y="60" text-anchor="middle" font-size="16" font-weight="700" fill="#f2f5f4" font-family="system-ui">${'022812'[i]}</text>`).join('')}<rect x="186" y="40" width="9" height="28" rx="2" fill="#c93a2a"/><rect x="36" y="80" width="145" height="3" rx="1.5" fill="var(--accent)"/><text x="30" y="102" font-size="11" fill="var(--muted)" font-family="system-ui">diese Ziffern ablesen</text><text x="200" y="27" text-anchor="end" font-size="11" fill="var(--muted)" font-family="system-ui">kWh</text></svg>`;
+const ART = (id, s = 84) => `<div class="guide-art"><svg width="${s}" height="${s}" viewBox="0 0 24 24" style="color:var(--accent)"><use href="#i-${id}"/></svg></div>`;
+function guideSteps() { return guide.mode === 'help' ? ['hWelcome', 'hRead', 'hStats', 'hContracts', 'hSave', 'hInstall'] : ['welcome', 'need', 'household', 'contract', 'term', 'meter', 'done']; }
+function openGuide(mode = 'setup', step = 0) {
+  guide.mode = mode; guide.step = step;
+  if (mode === 'setup' && !guide.draft.beginn && guide.draft.beginn !== '') guide.draft = { name: '', personen: 2, wohnform: 'wohnung', anbieter: '', beginn: '', ap: '', gp: '', ab: '', ende: '', fwert: '', feinheit: 'wochen', bsofort: '', bneu: '', datum: todayStr(), stand: '' };
+  renderGuide();
+  if (!$('guide').open) $('guide').showModal();
+}
+const installHtml = () => `<div class="checks">
+  <div class="check"><div class="n">1</div><div><b>iPhone und iPad (Safari)</b><span>Unten auf das Teilen-Symbol tippen, dann „Zum Home-Bildschirm“. Wichtig: Nur so behält Safari deine Daten dauerhaft.</span></div></div>
+  <div class="check"><div class="n">2</div><div><b>Android (Chrome)</b><span>Oben rechts auf ⋮ tippen, dann „App installieren“ oder „Zum Startbildschirm hinzufügen“.</span></div></div>
+  <div class="check"><div class="n">3</div><div><b>Computer</b><span>Als Lesezeichen speichern. In Chrome und Edge geht auch „Installieren“ in der Adressleiste.</span></div></div></div>`;
+const saveHtml = () => `<div class="checks">
+  <div class="check"><div class="n">${icon('check', 16)}</div><div><b>Automatisch auf diesem Gerät</b><span>Alles wird sofort hier gespeichert. Kein Konto, niemand außer dir sieht deine Daten.</span></div></div>
+  <div class="check"><div class="n">${icon('save', 16)}</div><div><b>Sicherungsdatei ab und zu</b><span>Unter „Mehr → Sicherung speichern“. Leg sie z. B. in iCloud Drive oder Google Drive. Das Zählerbuch erinnert dich nach 30 Tagen.</span></div></div>
+  <div class="check"><div class="n">${icon('swap', 16)}</div><div><b>Neues Gerät?</b><span>Zählerbuch dort öffnen, „Sicherung laden“ wählen, fertig.</span></div></div></div>`;
+function renderGuide() {
+  const steps = guideSteps(), id = steps[guide.step], g = guide.draft;
+  $('guideDots').innerHTML = steps.map((_, i) => `<i class="${i === guide.step ? 'on' : ''}"></i>`).join('');
+  const back = guide.step > 0 ? `<button class="btn" type="button" data-g="back">Zurück</button>` : '';
+  const next = (label, act = 'next') => `<button class="btn primary" type="button" data-g="${act}" style="flex:1">${label}</button>`;
+  let body = '', foot = '';
+  switch (id) {
+    case 'welcome':
+      body = `${ART('bolt')}<h2 id="guideTitle">Willkommen im Zählerbuch</h2>
+        <p>Hier trägst du regelmäßig deinen Stromzählerstand ein. Das Zählerbuch rechnet daraus Verbrauch und Kosten aus und sagt dir früh, ob eine <b>Nachzahlung</b> oder ein <b>Guthaben</b> kommt. Außerdem behältst du deine <b>Verträge und Kündigungsfristen</b> im Blick.</p>
+        <div class="checks"><div class="check"><div class="n">${icon('save', 18)}</div><div><b>Kein Konto, keine Anmeldung</b><span>Deine Daten bleiben auf diesem Gerät.</span></div></div>
+        <div class="check"><div class="n">${icon('bell', 18)}</div><div><b>Einmal im Monat, eine Minute</b><span>Zähler ablesen, Zahl eintippen, fertig.</span></div></div></div>`;
+      foot = `${next('Los geht’s')}<div class="btns" style="justify-content:center;gap:4px 18px"><button class="link-btn" type="button" data-g="demo">Erst ein Beispiel ansehen</button><button class="link-btn" type="button" data-act="import">Ich habe eine Sicherung</button></div>`;
+      break;
+    case 'need':
+      body = `<h2 id="guideTitle">Das brauchst du</h2><p>Leg dir für die nächsten zwei Minuten zwei Dinge bereit:</p>
+        <div class="checks">
+          <div class="check"><div class="n">1</div><div><b>Deinen Stromvertrag oder die letzte Rechnung</b><span>Daraus brauchst du: <b>Lieferbeginn</b>, <b>Arbeitspreis</b> in Cent pro kWh, <b>Grundpreis</b> pro Monat und deinen <b>monatlichen Abschlag</b>. Laufzeit, Kündigungsfrist und Bonus kannst du auch später ergänzen.</span></div></div>
+          <div class="check"><div class="n">2</div><div><b>Den aktuellen Zählerstand</b><span>Geh zum Stromzähler und lies die Zahl in kWh ab. Bei digitalen Zählern steht sie neben „1.8.0“.</span></div></div>
+        </div><p class="small muted">Gerade nicht zur Hand? Trag ungefähre Werte ein und korrigiere sie später unter „Verträge“.</p>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'household':
+      body = `<h2 id="guideTitle">Über dich</h2><p>Damit das Zählerbuch dich begrüßt und deinen Verbrauch mit ähnlichen Haushalten vergleichen kann.</p>
+        <div class="field"><label for="gName">Vorname <span class="muted">(optional)</span></label><input id="gName" class="input" type="text" maxlength="40" value="${esc(g.name)}" autocomplete="given-name"></div>
+        <div class="field"><span class="lbl" id="gPersL">Wie viele Personen leben im Haushalt?</span><div class="seg" role="group" aria-labelledby="gPersL">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-gpers="${n}" aria-pressed="${g.personen === n}">${n === 5 ? '5+' : n}</button>`).join('')}</div></div>
+        <div class="field"><span class="lbl" id="gWohnL">Wohnform</span><div class="seg" role="group" aria-labelledby="gWohnL"><button type="button" data-gwohn="wohnung" aria-pressed="${g.wohnform === 'wohnung'}">Wohnung</button><button type="button" data-gwohn="haus" aria-pressed="${g.wohnform === 'haus'}">Haus</button></div></div>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'contract':
+      body = `<h2 id="guideTitle">Dein Stromvertrag</h2><p>Diese Werte stehen in deiner Vertragsbestätigung oder auf der Rechnung.</p>
+        <div class="field"><label for="gAnbieter">Anbieter</label><input id="gAnbieter" class="input" type="text" maxlength="60" placeholder="z. B. Stadtwerke Musterstadt" value="${esc(g.anbieter)}"></div>
+        <div class="field"><label for="gBeginn">Lieferbeginn bzw. Beginn des Abrechnungsjahres</label><input id="gBeginn" class="input" type="date" value="${g.beginn}"><span class="help">Z. B. 01.10.2025 bei „Abrechnungszeitraum 01.10.2025 – 30.09.2026“.</span></div>
+        <div class="field"><label for="gAp">Arbeitspreis</label><div class="unit"><input id="gAp" class="input" type="text" inputmode="decimal" placeholder="z. B. 33,13" value="${esc(g.ap)}"><span>ct/kWh</span></div><span class="help">Preis pro Kilowattstunde, brutto. Oft „Verbrauchspreis“ genannt.</span></div>
+        <div class="grid2 wrap">
+          <div class="field"><label for="gGp">Grundpreis</label><div class="unit"><input id="gGp" class="input" type="text" inputmode="decimal" placeholder="z. B. 13,76" value="${esc(g.gp)}"><span>€/Monat</span></div></div>
+          <div class="field"><label for="gAb">Abschlag</label><div class="unit"><input id="gAb" class="input" type="text" inputmode="decimal" placeholder="z. B. 82" value="${esc(g.ab)}"><span>€/Monat</span></div></div>
+        </div><span class="help">Steht der Grundpreis pro Jahr da, teile ihn durch 12.</span><p id="gMsg" class="msg" hidden></p>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'term':
+      body = `${ART('clock', 72)}<h2 id="guideTitle">Laufzeit, Kündigung, Bonus</h2><p>Damit erinnert dich das Zählerbuch rechtzeitig vor der Kündigungsfrist, und ein Wechselbonus wird eingerechnet. <b>Alles optional</b>, du kannst es auch später unter „Verträge“ eintragen.</p>
+        <div class="field"><label for="gEnde">Erstlaufzeit bis</label><input id="gEnde" class="input" type="date" value="${g.ende}"></div>
+        <div class="grid2"><div class="field"><label for="gFwert">Kündigungsfrist</label><input id="gFwert" class="input" type="text" inputmode="numeric" placeholder="z. B. 6" value="${esc(g.fwert)}"></div>
+          <div class="field"><label for="gFeinheit">&nbsp;</label><select id="gFeinheit" class="input"><option value="wochen" ${g.feinheit === 'wochen' ? 'selected' : ''}>Wochen</option><option value="monate" ${g.feinheit === 'monate' ? 'selected' : ''}>Monate</option></select></div></div>
+        <div class="grid2"><div class="field"><label for="gSofort">Sofortbonus</label><div class="unit"><input id="gSofort" class="input" type="text" inputmode="decimal" placeholder="0" value="${esc(g.bsofort)}"><span>€</span></div></div>
+          <div class="field"><label for="gNeu">Neukundenbonus</label><div class="unit"><input id="gNeu" class="input" type="text" inputmode="decimal" placeholder="0" value="${esc(g.bneu)}"><span>€</span></div></div></div>
+        <span class="help">Sofortbonus wird kurz nach Lieferbeginn ausgezahlt, der Neukundenbonus mit der ersten Jahresrechnung verrechnet. Manche Anbieter geben beides.</span>
+        <p id="gMsg" class="msg" hidden></p>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'meter':
+      body = `<h2 id="guideTitle">Dein erster Zählerstand</h2><div class="guide-art" style="height:auto;padding:16px">${METER_ART}</div>
+        <p>Lies nur die <b>schwarzen Ziffern</b> ab. Eine rote Ziffer oder Nachkommastelle lässt du weg.</p>
+        <div class="field"><label for="gStand">Zählerstand</label><div class="unit"><input id="gStand" class="input big" type="text" inputmode="decimal" placeholder="z. B. 22812" value="${esc(g.stand)}"><span>kWh</span></div></div>
+        <div class="field"><label for="gDatum">Abgelesen am</label><input id="gDatum" class="input" type="date" value="${g.datum}" max="${todayStr()}"></div>
+        <p class="small muted">Tipp: Lies immer etwa am gleichen Tag ab, z. B. am 1. des Monats. Alte Zählerstände kannst du danach mit ihrem Datum nachtragen.</p><p id="gMsg" class="msg" hidden></p>`;
+      foot = `<div class="btns">${back}${next('Zählerbuch anlegen', 'create')}</div>`;
+      break;
+    case 'done':
+      body = `${ART('check')}<h2 id="guideTitle">Fertig. So speicherst du</h2>${saveHtml()}<h3>Als App auf den Startbildschirm</h3>${installHtml()}`;
+      foot = next('Zum Zählerbuch', 'finish');
+      break;
+    case 'hWelcome':
+      body = `${ART('help')}<h2 id="guideTitle">So funktioniert das Zählerbuch</h2><p>Eine kurze Tour in fünf Schritten: ablesen, verstehen, Verträge, sichern, installieren.</p>`;
+      foot = next('Weiter');
+      break;
+    case 'hRead':
+      body = `<h2 id="guideTitle">1. Zähler ablesen</h2><div class="guide-art" style="height:auto;padding:16px">${METER_ART}</div>
+        <p>Tippe auf <b>„Ablesen“</b> und trag die schwarzen Ziffern ein. Das Datum ist automatisch heute, du kannst es ändern, um alte Werte nachzutragen.</p>
+        <p>Ist die Zahl kleiner als beim letzten Mal oder ungewöhnlich hoch, fragt das Zählerbuch nach. Falsche Einträge änderst du unter <b>„Verlauf“</b>.</p>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'hStats':
+      body = `<h2 id="guideTitle">2. Ergebnisse verstehen</h2>
+        <div class="checks">
+          <div class="check"><div class="n">${icon('home', 18)}</div><div><b>Übersicht</b><span>Nachzahlung oder Guthaben. Am Anfang eines Jahres siehst du eine Spanne, die mit jeder Ablesung schmaler wird.</span></div></div>
+          <div class="check"><div class="n">${icon('chart', 18)}</div><div><b>Verlauf</b><span>Verbrauch pro Monat, Kosten gegen Abschläge, alle Ablesungen.</span></div></div>
+          <div class="check"><div class="n">${icon('stats', 18)}</div><div><b>Statistik</b><span>Vergleich mit ähnlichen Haushalten, CO₂, Vorjahr, Sommer und Winter, Kalender.</span></div></div>
+        </div><p class="small muted">Geschätzte Teile sind schraffiert. Grundlage ist dein Vorjahr oder dein Durchschnitt.</p>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'hContracts':
+      body = `${ART('doc', 72)}<h2 id="guideTitle">3. Verträge im Griff</h2>
+        <div class="checks">
+          <div class="check"><div class="n">${icon('doc', 18)}</div><div><b>Vertragsakte</b><span>Anbieter, Preise, Kunden- und Zählernummer, Kontakt, alles an einem Ort.</span></div></div>
+          <div class="check"><div class="n">${icon('clock', 18)}</div><div><b>Kündigungs-Countdown</b><span>Zeigt, bis wann du kündigen musst, und trägt die Frist auf Wunsch in deinen Kalender ein.</span></div></div>
+          <div class="check"><div class="n">${icon('swap', 18)}</div><div><b>Anbieter wechseln</b><span>Neuen Vertrag anlegen, eine Checkliste begleitet dich durch den Wechsel. Bonus wird eingerechnet.</span></div></div>
+        </div>`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'hSave':
+      body = `<h2 id="guideTitle">4. Speichern und sichern</h2>${saveHtml()}`;
+      foot = `<div class="btns">${back}${next('Weiter')}</div>`;
+      break;
+    case 'hInstall':
+      body = `<h2 id="guideTitle">5. Als App installieren</h2><p>Dann öffnest du das Zählerbuch wie jede andere App, auch ohne Internet.</p>${installHtml()}`;
+      foot = `<div class="btns">${back}${next('Fertig', 'finish')}</div>`;
+      break;
+  }
+  $('guideBody').innerHTML = body; $('guideBody').scrollTop = 0;
+  $('guideFoot').innerHTML = foot;
+}
+function readGuideInputs() {
+  const g = guide.draft, v = id => $(id) ? $(id).value : undefined;
+  if ($('gName')) g.name = v('gName').trim();
+  if ($('gBeginn')) { g.anbieter = v('gAnbieter').trim(); g.beginn = v('gBeginn'); g.ap = v('gAp'); g.gp = v('gGp'); g.ab = v('gAb'); }
+  if ($('gEnde')) { g.ende = v('gEnde'); g.fwert = v('gFwert'); g.feinheit = v('gFeinheit'); g.bsofort = v('gSofort'); g.bneu = v('gNeu'); }
+  if ($('gStand')) { g.stand = v('gStand'); g.datum = v('gDatum'); }
+}
+function guideValidate(id) {
+  const g = guide.draft, msg = $('gMsg'), bad = t => (showMsg(msg, t, 'err'), false);
+  if (id === 'contract') {
+    const ap = parseNum(g.ap), gp = parseNum(g.gp), ab = parseNum(g.ab);
+    if (!isDate(g.beginn)) return bad('Bitte den Lieferbeginn wählen.');
+    if (!isFinite(ap) || ap <= 0) return bad('Bitte den Arbeitspreis in Cent eintragen, z. B. 33,13.');
+    if (ap < 1) return bad(`Der Arbeitspreis wird in Cent angegeben: ${fmtN(ap * 100, 2)} statt ${String(g.ap)}.`);
+    if (ap > 200) return bad('Der Arbeitspreis scheint zu hoch. Bitte in Cent pro kWh, z. B. 33,13.');
+    if (!isFinite(gp) || gp < 0) return bad('Bitte den Grundpreis pro Monat eintragen, z. B. 13,76.');
+    if (!isFinite(ab) || ab < 0) return bad('Bitte deinen monatlichen Abschlag eintragen, z. B. 82.');
+  }
+  if (id === 'term') {
+    if (g.ende && (!isDate(g.ende) || g.ende <= g.beginn)) return bad('Das Laufzeitende muss nach dem Lieferbeginn liegen.');
+    if (g.fwert.trim() && !/^\d{1,2}$/.test(g.fwert.trim())) return bad('Bitte die Frist als ganze Zahl eintragen, z. B. 6.');
+    if ([g.bsofort, g.bneu].some(x => x.trim() && !(parseNum(x) >= 0))) return bad('Bitte den Bonus als Zahl eintragen, z. B. 100.');
+  }
+  if (id === 'meter') {
+    const st = parseNum(g.stand);
+    if (!String(g.stand).trim() || !isFinite(st) || st < 0) return bad('Bitte den Zählerstand als Zahl eintragen, z. B. 22812.');
+    if (!isDate(g.datum) || g.datum > todayStr()) return bad('Bitte ein Datum wählen, nicht in der Zukunft.');
+  }
+  return true;
+}
+$('guide').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-g], [data-gpers], [data-gwohn]');
+  if (!b) return;
+  readGuideInputs();
+  const id = guideSteps()[guide.step];
+  if (b.dataset.gpers) { guide.draft.personen = +b.dataset.gpers; renderGuide(); return; }
+  if (b.dataset.gwohn) { guide.draft.wohnform = b.dataset.gwohn; renderGuide(); return; }
+  const act = b.dataset.g;
+  if (act === 'back') { guide.step--; renderGuide(); }
+  else if (act === 'next') { if (!guideValidate(id)) return; guide.step++; renderGuide(); }
+  else if (act === 'demo') { app.demo = true; app.state = sampleState(); app.period = null; $('guide').close(); render(); toast('Beispieldaten. Nichts wird gespeichert.'); }
+  else if (act === 'create') {
+    if (!guideValidate(id)) return;
+    const g = guide.draft, beginn = g.beginn < g.datum ? g.beginn : g.datum;
+    const s = sanitize({ profil: { name: g.name, personen: g.personen, wohnform: g.wohnform },
+      vertraege: [{ anbieter: g.anbieter, beginn, ende: g.ende || null, frist: { wert: g.fwert.trim() ? parseInt(g.fwert, 10) : null, einheit: g.feinheit },
+        bonus: { sofort: { betrag: g.bsofort.trim() ? parseNum(g.bsofort) : 0 }, neukunde: { betrag: g.bneu.trim() ? parseNum(g.bneu) : 0 } }, preise: [{ ab: beginn, arbeitspreis: parseNum(g.ap), grundpreis: parseNum(g.gp), abschlag: parseNum(g.ab) }] }],
+      readings: [{ datum: g.datum, stand: parseNum(g.stand) }] });
+    app.demo = false; app.period = null; app.tab = 'home';
+    commit(s); store.setPref('onboarded', true);
+    guide.step++; renderGuide();
+  }
+  else if (act === 'finish') { $('guide').close(); store.setPref('onboarded', true); }
+});
+$('guide').addEventListener('cancel', ev => { if (guide.mode === 'setup' && !app.demo && !store.load()) ev.preventDefault(); });
+
+// ================= Ereignisse =================
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-tab], [data-goto], [data-period], [data-act], [data-pers], [data-wohn], [data-int], [data-theme-set]');
+  if (!t || (t.closest('#guide') && !t.dataset.act) || t.closest('#contractDlg') && !t.dataset.act) return;
+  if (t.dataset.tab || t.dataset.goto) { app.tab = t.dataset.tab || t.dataset.goto; app.confirmDel = null; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  if (t.dataset.period) { app.period = t.dataset.period; render(); return; }
+  const s = app.state;
+  if (t.dataset.pers || t.dataset.wohn || t.dataset.int) {
+    if (app.demo) { toast('In den Beispieldaten nicht änderbar.'); return; }
+    if (t.dataset.pers) commit({ ...s, profil: { ...s.profil, personen: +t.dataset.pers } });
+    if (t.dataset.wohn) commit({ ...s, profil: { ...s.profil, wohnform: t.dataset.wohn } });
+    if (t.dataset.int) commit({ ...s, erinnerung: { intervall: t.dataset.int } });
+    return;
+  }
+  if (t.dataset.themeSet) { store.setPref('theme', t.dataset.themeSet); applyTheme(); render(); return; }
+  const act = t.dataset.act;
+  if (act === 'read') openEntry();
+  else if (act === 'close-entry') $('entrySheet').close();
+  else if (act === 'close-contract') $('contractDlg').close();
+  else if (act === 'help') openGuide('help', 0);
+  else if (act === 'close-guide') { if (guide.mode === 'setup' && !app.demo && !store.load()) { app.demo = true; app.state = sampleState(); app.period = null; render(); } $('guide').close(); }
+  else if (act === 'setup') openGuide('setup', 1);
+  else if (act === 'import') { $('fileIn').value = ''; $('fileIn').click(); }
+  else if (act === 'edit') openEntry(t.dataset.d);
+  else if (act === 'del') { app.confirmDel = t.dataset.d; render(); }
+  else if (act === 'del-no') { app.confirmDel = null; render(); }
+  else if (act === 'del-yes') { app.confirmDel = null; commit({ ...s, readings: s.readings.filter(r => r.datum !== t.dataset.d) }, 'Ablesung gelöscht'); }
+  else if (act === 'edit-contract') openContract(t.dataset.id);
+  else if (act === 'new-contract') openContract();
+  else if (act === 'ck-toggle') { app.ckOpen = app.ckOpen === t.dataset.id ? null : t.dataset.id; render(); }
+  else if (act === 'check') {
+    if (app.demo) { toast('In den Beispieldaten nicht änderbar.'); return; }
+    const k = t.dataset.k;
+    const vertraege = s.vertraege.map(c => { if (c.id !== t.dataset.id) return c; const checks = { ...c.checks }; const which = k === 'sofortbonus' ? 'sofort' : k === 'neubonus' ? 'neukunde' : null; const wasDone = !!checks[k] || !!(which && c.bonus[which].erhalten); if (wasDone) delete checks[k]; else checks[k] = todayStr(); const bonus = which ? { ...c.bonus, [which]: { ...c.bonus[which], erhalten: wasDone ? null : todayStr() } } : c.bonus; return { ...c, checks, bonus }; });
+    commit({ ...s, vertraege });
+  }
+  else if (act === 'copy') { const v = t.dataset.v; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast('Kopiert'), () => toast(v)); }
+  else if (act === 'backup') doBackup();
+  else if (act === 'share') doShare();
+  else if (act === 'csv') downloadFile(`zaehlerbuch-${todayStr()}.csv`, '﻿Datum;Zählerstand (kWh)\r\n' + s.readings.map(r => `${fmtD(r.datum)};${String(r.stand).replace('.', ',')}`).join('\r\n') + '\r\n', 'text/csv');
+  else if (act === 'ics') { downloadFile('zaehler-ablesen.ics', icsReading(), 'text/calendar'); toast('Kalenderdatei geladen. Öffne sie zum Eintragen.'); }
+  else if (act === 'ics-kuendigung') { const c = s.vertraege.find(x => x.id === t.dataset.id); downloadFile('kuendigungsfrist.ics', icsKuendigung(c), 'text/calendar'); toast('Frist als Kalenderdatei geladen'); }
+  else if (act === 'goal-suggest') { if (app.demo) return; commit({ ...s, ziel: { kwh: +t.dataset.v } }, 'Sparziel gesetzt'); }
+  else if (act === 'goto-goal') { app.tab = 'einstellungen'; render(); setTimeout(() => { $('goalSettings').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('stZiel').focus({ preventScroll: true }); }, 50); }
+  else if (act === 'reset') $('resetZone').innerHTML = `<div class="confirm"><span>Wirklich alle Daten von diesem Gerät löschen?</span><span class="btns"><button class="btn danger sm" type="button" data-act="reset-yes">Ja, löschen</button><button class="btn sm" type="button" data-act="reset-no">Abbrechen</button></span></div>`;
+  else if (act === 'reset-no') render();
+  else if (act === 'reset-yes') { store.clear(); store.setPref('onboarded', false); app.state = sampleState(); app.demo = true; app.period = null; app.tab = 'home'; render(); guide.draft = {}; openGuide('setup', 0); }
+});
+document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('.card[data-goto]')) { ev.preventDefault(); ev.target.click(); } });
+document.addEventListener('change', ev => {
+  const inp = ev.target, s = app.state;
+  if (inp.id === 'fileIn') { const f = inp.files[0]; if (f) importFile(f); return; }
+  if (!inp.closest('[data-panel="einstellungen"]')) return;
+  if (app.demo) { toast('In den Beispieldaten nicht änderbar.'); render(); return; }
+  const k = inp.dataset.set;
+  if (k === 'name') return commit({ ...s, profil: { ...s.profil, name: inp.value.trim().slice(0, 40) } }, 'Gespeichert');
+  if (k === 'co2') { const v = parseNum(inp.value); if (isFinite(v) && v >= 0) return commit({ ...s, profil: { ...s.profil, co2: v } }, 'Gespeichert'); return toast('Bitte eine Zahl eintragen.'); }
+  if (k === 'ziel') { const v = inp.value.trim() ? parseNum(inp.value) : null; if (v === null || (isFinite(v) && v > 0)) return commit({ ...s, ziel: { kwh: v } }, v ? 'Sparziel gespeichert' : 'Sparziel entfernt'); return toast('Bitte eine Zahl in kWh eintragen.'); }
+});
+function applyTheme() { const t = store.prefs().theme; if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
+let rz;
+new ResizeObserver(() => { clearTimeout(rz); rz = setTimeout(() => { if (app.state && (app.tab === 'verlauf' || app.tab === 'statistik')) { app.lastTab = app.tab; render(); } }, 150); }).observe(document.querySelector('main'));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && app.state) renderHeader(); });
+
+// ================= Start =================
+(function boot() {
+  applyTheme();
+  const saved = store.load();
+  if (saved) { app.state = saved; app.demo = false; store.save(saved); }
+  else { app.state = sampleState(); app.demo = true; }
+  render();
+  if (!saved && !store.prefs().onboarded) openGuide('setup', 0);
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+</script>
+</body>
+</html>
